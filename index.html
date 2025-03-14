@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Okuma Değerlendirme Tablosu (Dinamik Sınıflar, Sınıf Silme & Düzenleme)</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    /* ========== CSS ========== */
+    * {
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.4;
+      background-color: #f5f5f5;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1200px; 
+      margin: 0 auto;
+      background: #fff; 
+      padding: 20px;
+      border-radius: 8px; 
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* Ana Başlık - 12 punto */
+    .main-title {
+      color: #333; 
+      text-align: center;
+      margin-bottom: 5px; 
+      font-size: 12pt;  
+      line-height: 1.2; 
+      white-space: pre-line;
+    }
+
+    .form-container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 20px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 12px;
+      box-shadow: inset 2px 2px 5px #d1d1d1, inset -2px -2px 5px #ffffff;
+    }
+
+    .title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .student-info-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    /* ========== Input Alanları ========== */
+    .input-long {
+      flex: 1;
+      width: 100%;
+      min-width: 280px;
+      max-width: 100%;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      background: linear-gradient(145deg, #ffffff, #f0f0f0);
+      box-shadow: 5px 5px 10px #d1d1d1, -5px -5px 10px #ffffff;
+      transition: all 0.3s ease;
+    }
+
+    .input-medium {
+      flex: 2;
+      min-width: 200px;
+      max-width: 300px;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      background: linear-gradient(145deg, #ffffff, #f0f0f0);
+      box-shadow: 5px 5px 10px #d1d1d1, -5px -5px 10px #ffffff;
+      transition: all 0.3s ease;
+    }
+
+    .input-short {
+      flex: 1;
+      min-width: 150px;
+      max-width: 180px;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      background: linear-gradient(145deg, #ffffff, #f0f0f0);
+      box-shadow: 5px 5px 10px #d1d1d1, -5px -5px 10px #ffffff;
+      transition: all 0.3s ease;
+    }
+
+    /* Input focus efektleri */
+    .input-long:focus,
+    .input-medium:focus,
+    .input-short:focus {
+      outline: none;
+      box-shadow: inset 5px 5px 10px #d1d1d1, inset -5px -5px 10px #ffffff;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* ====== Sınıf Butonları (Tabs) ====== */
+    .tabs-container {
+      display: flex; 
+      gap: 8px; 
+      margin-bottom: 10px;
+      flex-wrap: wrap; 
+      justify-content: center;
+    }
+    .class-tab-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(145deg, #ffffff, #f0f0f0);
+      padding: 4px;
+      border-radius: 16px;
+      box-shadow: 5px 5px 10px #d1d1d1, -5px -5px 10px #ffffff;
+      transition: all 0.3s ease;
+    }
+    .class-tab-wrapper:hover {
+      transform: translateY(-2px);
+      box-shadow: 6px 6px 12px #c1c1c1, -6px -6px 12px #ffffff;
+    }
+    .tab-btn {
+      background: linear-gradient(145deg, #f0f0f0, #e0e0e0);
+      color: #333;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 30px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 5px 5px 10px #d1d1d1,
+                  -2px -2px 6px #ffffff;
+      transition: all 0.3s ease;
+    }
+    .tab-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 6px 6px 12px #c1c1c1,
+                  -3px -3px 8px #ffffff;
+    }
+    .tab-btn:active {
+      box-shadow: 0 2px 0 #bdbdbd, 0 2px 6px rgba(0,0,0,0.2);
+      transform: translateY(1px);
+    }
+    .tab-btn.active {
+      background: linear-gradient(145deg, #673AB7, #5E35B1);
+      color: white;
+      box-shadow: inset 4px 4px 8px rgba(0,0,0,0.2),
+                  inset -2px -2px 6px rgba(255,255,255,0.1);
+    }
+
+    /* Sınıf düzenle ve sil butonları */
+    .class-edit-btn, .class-delete-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      opacity: 0.7;
+      position: relative;
+      overflow: hidden;
+    }
+    .class-edit-btn {
+      background: linear-gradient(145deg, #4CAF50, #388E3C);
+      color: white;
+    }
+    .class-delete-btn {
+      background: linear-gradient(145deg, #f44336, #d32f2f);
+      color: white;
+    }
+    .class-edit-btn:hover, .class-delete-btn:hover {
+      opacity: 1;
+      transform: translateY(-2px);
+    }
+    .class-edit-btn::before, .class-delete-btn::before {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    .class-edit-btn:hover::before, .class-delete-btn:hover::before {
+      opacity: 1;
+      visibility: visible;
+      bottom: -35px;
+    }
+    .class-edit-btn:active, .class-delete-btn:active {
+      transform: scale(0.95);
+    }
+    .class-edit-btn::after, .class-delete-btn::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+      background-repeat: no-repeat;
+      background-position: 50%;
+      transform: scale(10, 10);
+      opacity: 0;
+      transition: transform .5s, opacity 1s;
+    }
+    .class-edit-btn:active::after, .class-delete-btn:active::after {
+      transform: scale(0, 0);
+      opacity: 0.3;
+      transition: 0s;
+    }
+
+    /* ========== Normal Butonlar ========== */
+    .add-btn {
+      background: linear-gradient(145deg, #4CAF50, #388E3C);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 5px 5px 10px rgba(56, 142, 60, 0.3),
+                  -2px -2px 6px rgba(76, 175, 80, 0.2);
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+    .add-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 6px 6px 12px rgba(56, 142, 60, 0.4),
+                  -3px -3px 8px rgba(76, 175, 80, 0.3);
+    }
+    .add-btn:active {
+      box-shadow: 0 2px 0 #388E3C, 0 2px 6px rgba(0,0,0,0.2);
+      transform: translateY(1px);
+    }
+
+    .print-btn {
+      background: linear-gradient(145deg, #2196F3, #1976D2);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 5px 5px 10px rgba(25, 118, 210, 0.3),
+                  -2px -2px 6px rgba(33, 150, 243, 0.2);
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+    .print-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 6px 6px 12px rgba(25, 118, 210, 0.4),
+                  -3px -3px 8px rgba(33, 150, 243, 0.3);
+    }
+    .print-btn:active {
+      box-shadow: 0 2px 0 #1976D2, 0 2px 6px rgba(0,0,0,0.2);
+      transform: translateY(1px);
+    }
+
+    .clear-btn {
+      background: linear-gradient(145deg, #FF9800, #F57C00);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 5px 5px 10px rgba(245, 124, 0, 0.3),
+                  -2px -2px 6px rgba(255, 152, 0, 0.2);
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+    .clear-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 6px 6px 12px rgba(245, 124, 0, 0.4),
+                  -3px -3px 8px rgba(255, 152, 0, 0.3);
+    }
+    .clear-btn:active {
+      box-shadow: 0 2px 0 #F57C00, 0 2px 6px rgba(0,0,0,0.2);
+      transform: translateY(1px);
+    }
+
+    .edit-criteria-btn {
+      background: linear-gradient(145deg, #9C27B0, #7B1FA2);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 5px 5px 10px rgba(123, 31, 162, 0.3),
+                  -2px -2px 6px rgba(156, 39, 176, 0.2);
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+    .edit-criteria-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 6px 6px 12px rgba(123, 31, 162, 0.4),
+                  -3px -3px 8px rgba(156, 39, 176, 0.3);
+    }
+    .edit-criteria-btn:active {
+      box-shadow: 0 2px 0 #7B1FA2, 0 2px 6px rgba(0,0,0,0.2);
+      transform: translateY(1px);
+    }
+
+    .excel-btn {
+      background: linear-gradient(145deg, #009688, #00796B);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 5px 5px 10px rgba(0, 121, 107, 0.3),
+                  -2px -2px 6px rgba(0, 150, 136, 0.2);
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+    .excel-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 6px 6px 12px rgba(0, 121, 107, 0.4),
+                  -3px -3px 8px rgba(0, 150, 136, 0.3);
+    }
+    .excel-btn:active {
+      box-shadow: 0 2px 0 #00796B, 0 2px 6px rgba(0,0,0,0.2);
+      transform: translateY(1px);
+    }
+
+    /* ========== Tablo ========== */
+    .table-responsive {
+      overflow-x: auto; 
+      margin-bottom: 20px;
+      background: #fff; 
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      max-width: 297mm;
+    }
+    table {
+      width: 100%; 
+      border-collapse: collapse;
+      font-size: 11px; 
+      table-layout: fixed;
+    }
+    th, td {
+      border: 1px solid #ddd; 
+      padding: 4px;
+      text-align: center; 
+      vertical-align: middle;
+      word-wrap: break-word; 
+      overflow-wrap: break-word;
+      white-space: normal;
+    }
+    th {
+      background: #f8f9fa; 
+      font-weight: bold;
+    }
+    .criteria-header {
+      background: #e9ecef; 
+      font-size: 12pt;  
+      font-weight: bold; 
+      padding: 4px;
+    }
+    .criteria-row th {
+      font-size: 10px; 
+      background: #e9ecef; 
+      width: calc((100% - (6% + 14% + 5%)) / 10);
+      min-height: 40px; 
+      line-height: 1.1; 
+      padding: 2px;
+    }
+    .student-number-header {
+      width: 6%; 
+      background: #f8f9fa; 
+      font-size: 11px;
+    }
+    .name-header {
+      width: 14%; 
+      background: #f8f9fa; 
+      font-size: 11px;
+    }
+    .total-header {
+      width: 5%; 
+      background: #f8f9fa; 
+      font-size: 11px;
+    }
+    .score-input {
+      width: 100%; 
+      padding: 2px; 
+      border: 1px solid #ddd;
+      border-radius: 2px; 
+      font-size: 11px; 
+      text-align: center;
+    }
+
+    /* Tek Tablo başlığının ortalanması ve 12 punto ayarı */
+    #dynamicTableTitle {
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 12pt;
+    }
+
+    /* Popup Stilleri */
+    .popup-overlay {
+      display: none; 
+      position: fixed; 
+      top: 0; 
+      left: 0;
+      width: 100%; 
+      height: 100%; 
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 999; 
+      justify-content: center; 
+      align-items: center;
+    }
+    .popup {
+      background: white; 
+      padding: 20px; 
+      border-radius: 8px;
+      width: 90%; 
+      max-width: 400px; 
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .criteria-popup {
+      max-width: 600px; 
+      max-height: 90vh; 
+      overflow-y: auto;
+    }
+    .popup-header {
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .popup-header h3 {
+      margin: 0; 
+      font-size: 16px;
+    }
+    .popup-close {
+      background: none; 
+      border: none; 
+      font-size: 20px; 
+      cursor: pointer;
+      padding: 0; 
+      color: #666;
+    }
+    .popup-content {
+      margin-bottom: 15px;
+    }
+    .popup-content input, .popup-content textarea {
+      width: 100%; 
+      margin-bottom: 10px; 
+      padding: 8px;
+      border: 1px solid #ddd; 
+      border-radius: 4px;
+    }
+    .criteria-content {
+      max-height: calc(90vh - 150px); 
+      overflow-y: auto;
+    }
+    .criteria-input-group {
+      margin-bottom: 15px; 
+      padding: 10px; 
+      background: #f8f9fa; 
+      border-radius: 4px;
+    }
+    .criteria-input-group label {
+      display: block; 
+      margin-bottom: 5px; 
+      font-weight: bold;
+    }
+    .criteria-input-group textarea {
+      width: 100%; 
+      padding: 8px; 
+      border: 1px solid #ddd;
+      border-radius: 4px; 
+      resize: vertical; 
+      min-height: 60px;
+    }
+    .popup-buttons {
+      display: flex; 
+      gap: 10px; 
+      justify-content: flex-end;
+    }
+    .popup-save, .popup-cancel {
+      border-radius: 20px; 
+      font-size: 13px;
+      padding: 6px 12px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+    }
+    .popup-save {
+      background: #4CAF50; 
+      color: white;
+    }
+    .popup-cancel {
+      background: #dc3545; 
+      color: white;
+    }
+    .popup-save:hover, .popup-cancel:hover {
+      transform: translateY(-1px);
+    }
+    .popup-save:active, .popup-cancel:active {
+      transform: translateY(1px);
+    }
+    #editClassPopup .popup-header h3 {
+      font-size: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="form-container">
+      <!-- Ana başlık ve Alt Başlık grubu -->
+      <div class="title-group">
+        <input 
+          type="text" 
+          id="mainTitle" 
+          class="input-long" 
+          placeholder="Ana Başlık"
+          value="KARAMAN MESLEKİ VE TEKNİK ANADOLU LİSESİ TÜRK DİLİ VE EDEBİYATI KİTAP OKUMA ÖLÇEĞİ"
+        />
+        <input 
+          type="text" 
+          id="subTitle" 
+          class="input-long" 
+          placeholder="Alt Başlık"
+          value="Konuşma Sınavı Değerlendirme Kriterleri"
+        />
+        <input 
+          type="text" 
+          id="tableTitle" 
+          class="input-long" 
+          placeholder="Tablo Başlığı"
+          value="Konuşma Sınavı Değerlendirme"
+        />
+      </div>
+
+      <!-- Sınıf eklemek ve seçmek için -->
+      <div class="class-add-group" style="display:flex; gap:10px; align-items:center;">
+        <input 
+          type="text" 
+          id="newClassName" 
+          class="input-medium" 
+          placeholder="Yeni Sınıf Adı (ör. 9-A)"
+        />
+        <button class="excel-btn" onclick="addClass()">Sınıf Ekle</button>
+        <!-- Yeni eklenen sınıf seç menüsü -->
+        <select id="classSelect" onchange="switchClass(this.value)" class="input-medium">
+          <option value="">-- Sınıf Seçiniz --</option>
+        </select>
+      </div>
+
+      <!-- Sekme butonları (Sınıflar) + Düzenle / Sil -->
+      <div class="tabs-container" id="tabsContainer"></div>
+
+      <!-- Öğrenci bilgileri grubu -->
+      <div class="student-info-group">
+        <input 
+          type="text" 
+          id="studentNumber" 
+          class="input-short" 
+          placeholder="Öğrenci No" 
+          required
+        />
+        <input 
+          type="text" 
+          id="studentName" 
+          class="input-medium" 
+          placeholder="Öğrenci Adı Soyadı" 
+          required
+        />
+        <input 
+          type="number" 
+          id="studentPoints" 
+          class="input-short" 
+          placeholder="Puan Giriniz" 
+          min="0" 
+          max="100" 
+          step="5" 
+          required
+        />
+      </div>
+
+      <!-- Buton grubu (JSON'dan ekle butonu kaldırıldı) -->
+      <div class="button-group">
+        <button onclick="addStudent()" class="add-btn">Öğrenci Ekle</button>
+        <button onclick="printTables()" class="print-btn">Yazdır</button>
+        <button onclick="clearCurrentClassTable()" class="clear-btn">Tabloyu Temizle</button>
+        <button onclick="editCriteria()" class="edit-criteria-btn">Kriterleri Düzenle</button>
+        <button onclick="openExcelPopup()" class="excel-btn">Excel'den Ekle</button>
+      </div>
+    </div>
+
+    <div class="tables-container">
+      <div class="book-table">
+        <h1 class="main-title"></h1>
+        <h2 class="book-title" id="dynamicTableTitle">Tek Tablo</h2>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th rowspan="2" class="student-number-header">Öğrenci<br>No</th>
+                <th rowspan="2" class="name-header">Öğrenci<br>Adı Soyadı</th>
+                <th colspan="10" class="criteria-header"></th>
+                <th rowspan="2" class="total-header">Toplam</th>
+                <th rowspan="2" class="no-print">İşlem</th>
+              </tr>
+              <tr class="criteria-row" id="criteriaRow">
+                <!-- Kriterler JS ile eklenecek -->
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Düzenleme Popup'ı (Öğrenci) -->
+  <div class="popup-overlay" id="editPopup">
+    <div class="popup">
+      <div class="popup-header">
+        <h3>Öğrenci Düzenle</h3>
+        <button class="popup-close" onclick="closePopup()">&times;</button>
+      </div>
+      <div class="popup-content">
+        <input type="hidden" id="editStudentIndex" />
+        <input type="text" id="editStudentNumber" placeholder="Öğrenci Numarası" required />
+        <input type="text" id="editStudentName" placeholder="Öğrenci Adı Soyadı" required />
+        <input 
+          type="number" 
+          id="editPoints" 
+          placeholder="Kitap Puanı" 
+          min="0" 
+          max="100" 
+          step="5" 
+          required
+        />
+      </div>
+      <div class="popup-buttons">
+        <button onclick="closePopup()" class="popup-cancel">İptal</button>
+        <button onclick="saveEdit()" class="popup-save">Kaydet</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Kriterler Düzenleme Popup'ı -->
+  <div class="popup-overlay" id="criteriaPopup">
+    <div class="popup criteria-popup">
+      <div class="popup-header">
+        <h3><i class="fas fa-tasks"></i> Kriterleri Düzenle</h3>
+        <button class="popup-close" onclick="closeCriteriaPopup()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="criteria-content">
+        <div id="criteriaInputs"></div>
+      </div>
+      <div class="popup-buttons">
+        <button onclick="closeCriteriaPopup()" class="popup-cancel">
+          <i class="fas fa-times"></i> İptal
+        </button>
+        <button onclick="saveCriteria()" class="popup-save">
+          <i class="fas fa-check"></i> Kaydet
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Excel'den Ekle Popup'ı -->
+  <div class="popup-overlay" id="excelPopup">
+    <div class="popup excel-popup">
+      <div class="popup-header">
+        <h3><i class="fas fa-file-excel"></i> Excel'den Veri Ekle</h3>
+        <button class="popup-close" onclick="closeExcelPopup()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="excel-instructions">
+        <h4><i class="fas fa-info-circle"></i> Nasıl Kullanılır?</h4>
+        <ul>
+          <li><i class="fas fa-check"></i> Excel'den öğrenci listesini kopyalayın</li>
+          <li><i class="fas fa-check"></i> Her satır bir öğrenci bilgisi içermeli</li>
+          <li><i class="fas fa-check"></i> Format şu şekilde olmalı:</li>
+        </ul>
+        <div class="example">
+          123  Ahmet Yılmaz<br>
+          124  Ayşe Demir<br>
+          125  Mehmet Kaya
+        </div>
+      </div>
+
+      <textarea 
+        id="excelText" 
+        placeholder="Excel'den kopyaladığınız öğrenci listesini buraya yapıştırın..."
+      ></textarea>
+
+      <div class="popup-buttons">
+        <button onclick="closeExcelPopup()" class="popup-cancel">
+          <i class="fas fa-times"></i> İptal
+        </button>
+        <button onclick="parseExcelText()" class="popup-save">
+          <i class="fas fa-check"></i> Kaydet
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sınıf Düzenleme Popup'ı -->
+  <div class="popup-overlay" id="editClassPopup">
+    <div class="popup class-edit-popup">
+      <div class="popup-header">
+        <h3><i class="fas fa-edit"></i> Sınıf Düzenle</h3>
+        <button class="popup-close" onclick="closeEditClassPopup()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="popup-content">
+        <input type="hidden" id="oldClassName" />
+        <label for="newClassNameInput">
+          <i class="fas fa-school"></i> Yeni Sınıf Adı
+        </label>
+        <input 
+          type="text" 
+          id="newClassNameInput" 
+          placeholder="Örn: 9-B" 
+          required 
+        />
+      </div>
+      <div class="popup-buttons">
+        <button onclick="closeEditClassPopup()" class="popup-cancel">
+          <i class="fas fa-times"></i> İptal
+        </button>
+        <button onclick="saveClassEdit()" class="popup-save">
+          <i class="fas fa-check"></i> Kaydet
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ========== JavaScript ========== */
+
+    let allStudents = {}; 
+    let currentClass = null; 
+
+    const defaultCriteria = [
+      "1. Planlama",
+      "2. Akıcı Konuşma",
+      "3. Zaman Yönetimi",
+      "4. Anlatım Netliği",
+      "5. Beden Dili Kullanımı",
+      "6. Göz Teması Kurma",
+      "7. Ses Tonunu Etkili Kullanma",
+      "8. Dili Etkili Kullanma",
+      "9. Konuya Hakimiyet",
+      "10. Dinleyici İlgisini Canlı Tutma"
+    ];
+    let criteria = [...defaultCriteria];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateTitles();
+      updateCriteriaDisplay();
+      setupScoreInputs();
+      
+      // Önce localStorage'dan veri yüklemeyi dene
+      loadFromLocalStorage();
+      
+      // Eğer localStorage'da veri yoksa GitHub'dan yükle
+      if (Object.keys(allStudents).length === 0) {
+        // GitHub raw URL'ini buraya ekleyin
+        const jsonUrl = 'https://raw.githubusercontent.com/KULLANICI_ADINIZ/REPO_ADINIZ/main/data.json';
+        
+        fetch(jsonUrl)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Veri yüklenemedi');
+            }
+            return response.json();
+          })
+          .then(data => {
+            importJsonData(data);
+          })
+          .catch(err => {
+            console.error("Veri yüklenirken hata:", err);
+            // Hata durumunda varsayılan verileri kullan
+            const defaultData = {
+              "classes": [
+                {
+                  "name": "9-A",
+                  "students": [
+                    { "number": "101", "name": "Ahmet Yılmaz", "points": 70 },
+                    { "number": "102", "name": "Ayşe Demir", "points": 85 }
+                  ]
+                }
+              ]
+            };
+            importJsonData(defaultData);
+          });
+      }
+      
+      rebuildTabs();
+      updateClassSelectMenu();
+
+      // Başlık input'larının değişimini dinle
+      document.getElementById('mainTitle').addEventListener('input', updateTitles);
+      document.getElementById('subTitle').addEventListener('input', updateTitles);
+      document.getElementById('tableTitle').addEventListener('input', updateTitles);
+    });
+
+    /* Sınıf seç menüsünü güncelle */
+    function updateClassSelectMenu() {
+      console.log('updateClassSelectMenu çağrıldı'); // Debug için log
+      const select = document.getElementById('classSelect');
+      select.innerHTML = '<option value="">-- Sınıf Seçiniz --</option>';
+      
+      // Sınıfları alfabetik sıraya göre sırala
+      const sortedClasses = Object.keys(allStudents).sort();
+      console.log('Sıralanmış sınıflar:', sortedClasses); // Debug için log
+      
+      sortedClasses.forEach(cls => {
+        const option = document.createElement('option');
+        option.value = cls;
+        option.textContent = cls;
+        select.appendChild(option);
+      });
+      
+      // Eğer bir sınıf seçili değilse ve sınıflar varsa, ilk sınıfı seç
+      if (!currentClass && sortedClasses.length > 0) {
+        currentClass = sortedClasses[0];
+        select.value = currentClass;
+        highlightTab(currentClass);
+        updateTable();
+      }
+    }
+
+    /* ========== Sınıf Ekle/Sil/Düzenle ========== */
+    function addClass() {
+      const classNameInput = document.getElementById('newClassName');
+      const cls = classNameInput.value.trim();
+      if(!cls) {
+        alert("Lütfen sınıf adını giriniz (örn: 9-A).");
+        return;
+      }
+      if(allStudents[cls]) {
+        alert("Bu sınıf zaten mevcut: " + cls);
+        return;
+      }
+      allStudents[cls] = [];
+      classNameInput.value = '';
+      rebuildTabs();
+      updateClassSelectMenu();
+      switchClass(cls);
+      saveToLocalStorage();
+    }
+    function deleteClass(cls) {
+      if(!allStudents[cls]) return;
+      if(!confirm(`${cls} sınıfını tamamen silmek istediğinize emin misiniz?`)) {
+        return;
+      }
+      delete allStudents[cls];
+      if(cls === currentClass) {
+        const remaining = Object.keys(allStudents);
+        currentClass = remaining.length ? remaining[0] : null;
+      }
+      rebuildTabs();
+      updateClassSelectMenu();
+      highlightTab(currentClass);
+      updateTable();
+      saveToLocalStorage();
+    }
+    function editClass(cls) {
+      document.getElementById('oldClassName').value = cls;
+      document.getElementById('newClassNameInput').value = cls;
+      const popup = document.getElementById('editClassPopup');
+      popup.style.display = 'flex';
+      setTimeout(() => {
+        popup.classList.add('active');
+      }, 10);
+    }
+    function closeEditClassPopup() {
+      const popup = document.getElementById('editClassPopup');
+      popup.classList.remove('active');
+      setTimeout(() => {
+        popup.style.display = 'none';
+      }, 300);
+    }
+    function saveClassEdit() {
+      const oldName = document.getElementById('oldClassName').value;
+      const newName = document.getElementById('newClassNameInput').value.trim();
+      if(!newName) {
+        alert("Yeni sınıf adı boş olamaz!");
+        return;
+      }
+      if(oldName === newName) {
+        closeEditClassPopup();
+        return;
+      }
+      if(allStudents[newName]) {
+        alert("Bu sınıf adı zaten var: " + newName);
+        return;
+      }
+      allStudents[newName] = allStudents[oldName];
+      delete allStudents[oldName];
+      if(currentClass === oldName) {
+        currentClass = newName;
+      }
+      closeEditClassPopup();
+      rebuildTabs();
+      updateClassSelectMenu();
+      highlightTab(currentClass);
+      updateTable();
+      saveToLocalStorage();
+    }
+    function rebuildTabs() {
+      const tabsContainer = document.getElementById('tabsContainer');
+      tabsContainer.innerHTML = '';
+      for(const cls of Object.keys(allStudents)) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'class-tab-wrapper';
+
+        const btn = document.createElement('button');
+        btn.classList.add('tab-btn');
+        btn.textContent = cls;
+        btn.onclick = () => switchClass(cls);
+
+        const editBtn = document.createElement('button');
+        editBtn.className = 'class-edit-btn';
+        editBtn.textContent = '✎';
+        editBtn.title = 'Sınıfı Düzenle';
+        editBtn.onclick = (e) => {
+          e.stopPropagation();
+          editClass(cls);
+        };
+
+        const delBtn = document.createElement('button');
+        delBtn.className = 'class-delete-btn';
+        delBtn.textContent = '✕';
+        delBtn.title = 'Sınıfı Sil';
+        delBtn.onclick = (e) => {
+          e.stopPropagation();
+          deleteClass(cls);
+        };
+
+        wrapper.appendChild(btn);
+        wrapper.appendChild(editBtn);
+        wrapper.appendChild(delBtn);
+        tabsContainer.appendChild(wrapper);
+      }
+    }
+    function switchClass(cls) {
+      currentClass = cls;
+      highlightTab(cls);
+      updateTable();
+      document.getElementById("classSelect").value = cls;
+    }
+    function highlightTab(cls) {
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.classList.remove("active");
+        if (btn.textContent === cls) {
+          btn.classList.add("active");
+        }
+      });
+    }
+
+    /* ========== Öğrenci Ekle ========== */
+    window.addStudent = function() {
+      if(!currentClass) {
+        alert("Lütfen önce bir sınıf ekleyin ve seçin!");
+        return;
+      }
+      const numberInput = document.getElementById('studentNumber');
+      const nameInput = document.getElementById('studentName');
+      const pointsInput = document.getElementById('studentPoints');
+
+      const number = numberInput.value.trim();
+      const name = nameInput.value.trim();
+      const totalPoints = parseInt(pointsInput.value);
+
+      if (!number) {
+        alert('Lütfen öğrenci numarasını giriniz');
+        return;
+      }
+      if (!name) {
+        alert('Lütfen öğrenci adını giriniz');
+        return;
+      }
+      if (!totalPoints || totalPoints < 0 || totalPoints > 100) {
+        alert('Lütfen 0-100 arası puan giriniz');
+        return;
+      }
+      if(allStudents[currentClass].some(stu => stu.number === number)) {
+        alert("Bu numarada bir öğrenci zaten mevcut: " + currentClass);
+        return;
+      }
+      allStudents[currentClass].push({
+        number,
+        name,
+        scores: distributeCriteriaPoints(totalPoints)
+      });
+      updateTable();
+      saveToLocalStorage();
+      numberInput.value = '';
+      nameInput.value = '';
+      pointsInput.value = '';
+    };
+
+    /* ========== Tabloyu Temizle ========== */
+    window.clearCurrentClassTable = function() {
+      if(!currentClass) {
+        alert("Önce bir sınıf ekleyip seçmelisiniz!");
+        return;
+      }
+      if(confirm(`${currentClass} adlı sınıfın tablosunu temizlemek istediğinize emin misiniz?`)) {
+        allStudents[currentClass] = [];
+        updateTable();
+        saveToLocalStorage();
+      }
+    };
+
+    /* ========== Excel'den Ekle ========== */
+    function openExcelPopup() {
+      if(!currentClass) {
+        alert("Lütfen önce bir sınıf ekleyin ve seçin!");
+        return;
+      }
+      const popup = document.getElementById('excelPopup');
+      popup.style.display = 'flex';
+      setTimeout(() => {
+        popup.classList.add('active');
+      }, 10);
+    }
+    function closeExcelPopup() {
+      const popup = document.getElementById('excelPopup');
+      popup.classList.remove('active');
+      setTimeout(() => {
+        popup.style.display = 'none';
+        document.getElementById('excelText').value = '';
+      }, 300);
+    }
+    window.parseExcelText = function() {
+      if(!currentClass) return;
+      const textArea = document.getElementById('excelText');
+      const rawText = textArea.value.trim();
+      if(!rawText) {
+        alert("Lütfen Excel'den kopyaladığınız satırları yapıştırın.");
+        return;
+      }
+      const lines = rawText.split('\n').map(line => line.trim()).filter(Boolean);
+      let addedCount = 0;
+      lines.forEach(line => {
+        const parts = line.split(/\s+/).filter(Boolean);
+        if(parts.length >= 3) {
+          const studentNumber = parts[0];
+          const lastIndex = parts.length - 1;
+          const studentSurname = parts[lastIndex];
+          const studentName = parts.slice(1, lastIndex).join(' ');
+          if(!allStudents[currentClass].some(s => s.number === studentNumber)) {
+            const defaultPoints = 50;
+            allStudents[currentClass].push({
+              number: studentNumber,
+              name: (studentName + ' ' + studentSurname).trim(),
+              scores: distributeCriteriaPoints(defaultPoints)
+            });
+            addedCount++;
+          }
+        }
+      });
+      if(addedCount > 0) {
+        updateTable();
+        saveToLocalStorage();
+        alert(`Toplam ${addedCount} öğrenci eklendi (Sınıf: ${currentClass}).`);
+      } else {
+        alert("Eklenebilecek yeni öğrenci yok veya hepsi zaten kayıtlı.");
+      }
+      closeExcelPopup();
+    };
+
+    /* ========== JSON'dan Ekle Fonksiyonu (Artık kullanıcı etkileşimi yok, otomatik çağrılıyor) ========== */
+    function importJsonData(data) {
+      console.log('importJsonData çağrıldı:', data); // Debug için log
+      
+      if(!data.classes || !Array.isArray(data.classes)) {
+        console.error("JSON formatı hatalı! 'classes' dizisi bulunamadı.");
+        return;
+      }
+      
+      // Mevcut verileri temizle
+      allStudents = {};
+      
+      data.classes.forEach(clsObj => {
+        if(!clsObj.name || !clsObj.students || !Array.isArray(clsObj.students)) {
+          console.warn('Geçersiz sınıf verisi:', clsObj);
+          return;
+        }
+        
+        const className = clsObj.name.trim();
+        allStudents[className] = [];
+        
+        clsObj.students.forEach(stuObj => {
+          if(!stuObj.number || !stuObj.name || stuObj.points == null) {
+            console.warn('Geçersiz öğrenci verisi:', stuObj);
+            return;
+          }
+          
+          allStudents[className].push({
+            number: stuObj.number,
+            name: stuObj.name,
+            scores: distributeCriteriaPoints(parseInt(stuObj.points))
+          });
+        });
+      });
+
+      console.log('İşlenmiş veriler:', allStudents); // Debug için log
+      
+      // Sınıf seçim menüsünü güncelle
+      updateClassSelectMenu();
+      
+      // İlk sınıfı otomatik seç
+      if (Object.keys(allStudents).length > 0) {
+        currentClass = Object.keys(allStudents)[0];
+        document.getElementById("classSelect").value = currentClass;
+        highlightTab(currentClass);
+        updateTable();
+      }
+      
+      saveToLocalStorage();
+    }
+
+    /* ========== Öğrenci Düzenleme Fonksiyonları ========== */
+    window.editStudent = function(index) {
+      if(!currentClass) return;
+      const student = allStudents[currentClass][index];
+      const popup = document.getElementById('editPopup');
+      document.getElementById('editStudentIndex').value = index;
+      document.getElementById('editStudentNumber').value = student.number;
+      document.getElementById('editStudentName').value = student.name;
+      const totalPoints = student.scores.reduce((a,b)=>a+b,0);
+      document.getElementById('editPoints').value = totalPoints;
+      popup.style.display = 'flex';
+    };
+    window.closePopup = function() {
+      document.getElementById('editPopup').style.display = 'none';
+    };
+    window.saveEdit = function() {
+      if(!currentClass) return;
+      const index = parseInt(document.getElementById('editStudentIndex').value);
+      const number = document.getElementById('editStudentNumber').value.trim();
+      const name = document.getElementById('editStudentName').value.trim();
+      const totalPoints = parseInt(document.getElementById('editPoints').value);
+
+      if(!number || !name || (totalPoints<0 || totalPoints>100)) {
+        alert("Geçersiz veri!");
+        return;
+      }
+      if(allStudents[currentClass].some((stu, i) => i!==index && stu.number===number)) {
+        alert("Bu numara zaten var: " + number);
+        return;
+      }
+      allStudents[currentClass][index] = {
+        number,
+        name,
+        scores: distributeCriteriaPoints(totalPoints)
+      };
+      updateTable();
+      saveToLocalStorage();
+      closePopup();
+    };
+    window.deleteStudent = function(index) {
+      if(!currentClass) return;
+      if(confirm("Bu öğrenciyi silmek istediğinize emin misiniz?")) {
+        allStudents[currentClass].splice(index, 1);
+        updateTable();
+        saveToLocalStorage();
+      }
+    };
+
+    /* ========== Kriter Düzenleme ========== */
+    window.editCriteria = function() {
+      const popup = document.getElementById('criteriaPopup');
+      const inputsContainer = document.getElementById('criteriaInputs');
+      inputsContainer.innerHTML = '';
+      criteria.forEach((criterion, i) => {
+        const group = document.createElement('div');
+        group.className = 'criteria-input-group';
+        const label = document.createElement('label');
+        label.innerHTML = `<i class="fas fa-check-circle"></i> Kriter ${i+1}:`;
+        const textarea = document.createElement('textarea');
+        textarea.value = criterion.replace(/\n/g,' ');
+        textarea.id = `criterion${i}`;
+        group.appendChild(label);
+        group.appendChild(textarea);
+        inputsContainer.appendChild(group);
+      });
+      popup.style.display = 'flex';
+      setTimeout(() => {
+        popup.classList.add('active');
+      }, 10);
+    };
+    window.closeCriteriaPopup = function() {
+      document.getElementById('criteriaPopup').style.display = 'none';
+    };
+    window.saveCriteria = function() {
+      criteria = Array.from({ length: 10 }, (_, i) => {
+        const ta = document.getElementById(`criterion${i}`);
+        const words = ta.value.trim().split(' ');
+        let lines = [];
+        let currentLine = [];
+        let currentLength = 0;
+        words.forEach(word => {
+          if(currentLength + word.length > 15) {
+            lines.push(currentLine.join(' '));
+            currentLine = [word];
+            currentLength = word.length;
+          } else {
+            currentLine.push(word);
+            currentLength += word.length+1;
+          }
+        });
+        if(currentLine.length>0) lines.push(currentLine.join(' '));
+        return lines.join('\n');
+      });
+      updateCriteriaDisplay();
+      saveToLocalStorage();
+      closeCriteriaPopup();
+    };
+
+    /* ========== Tablo / Title / Kriterler ========== */
+    function updateTable() {
+      const tbody = document.getElementById('tableBody');
+      if(!tbody) return;
+      tbody.innerHTML = '';
+      if(!currentClass || !allStudents[currentClass]) {
+        return;
+      }
+      let arr = allStudents[currentClass];
+      arr.forEach((stu, idx) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${stu.number}</td><td>${stu.name}</td>`;
+        stu.scores.forEach((score, ci) => {
+          row.innerHTML += `
+            <td>
+              <input 
+                type="number" 
+                class="score-input"
+                value="${score}" 
+                min="0" 
+                max="10"
+                data-info="${currentClass}-${idx}-${ci}"
+              />
+            </td>`;
+        });
+        const total = stu.scores.reduce((a,b)=>a+b,0);
+        row.innerHTML += `
+          <td>${total}</td>
+          <td class="no-print">
+            <button onclick="editStudent(${idx})" class="edit-btn">Düzenle</button>
+            <button onclick="deleteStudent(${idx})" class="delete-btn">Sil</button>
+          </td>`;
+        tbody.appendChild(row);
+      });
+    }
+
+    function updateTitles() {
+      const mainTitle = document.getElementById('mainTitle').value;
+      const subTitle = document.getElementById('subTitle').value;
+      const tableTitle = document.getElementById('tableTitle').value;
+
+      document.querySelector('.main-title').textContent = mainTitle;
+      document.querySelector('.criteria-header').textContent = subTitle;
+      document.getElementById('dynamicTableTitle').textContent = tableTitle;
+    }
+
+    function updateCriteriaDisplay() {
+      const row = document.getElementById('criteriaRow');
+      row.innerHTML = '';
+      criteria.forEach(cr => {
+        const th = document.createElement('th');
+        th.innerHTML = cr;
+        row.appendChild(th);
+      });
+      updateTable();
+    }
+
+    function distributeCriteriaPoints(totalPoints) {
+      const count = 10;
+      const scores = Array(count).fill(5);
+      let remain = totalPoints - (5 * count);
+      if (remain < 0) {
+        const arr2 = Array(count).fill(0);
+        let p2 = totalPoints;
+        for (let i = 0; i < count; i++) {
+          let add = Math.floor(p2 / (count - i));
+          arr2[i] = add;
+          p2 -= add;
+        }
+        return arr2;
+      } else {
+        let i = 0;
+        while (remain > 0) {
+          scores[i % count] += 1;
+          remain--;
+          i++;
+        }
+        return scores;
+      }
+    }
+
+    /* ========== LocalStorage İşlemleri ========== */
+    function saveToLocalStorage() {
+      localStorage.setItem('allStudents', JSON.stringify(allStudents));
+      localStorage.setItem('criteria', JSON.stringify(criteria));
+    }
+    function loadFromLocalStorage() {
+      const storedStudents = localStorage.getItem('allStudents');
+      const storedCriteria = localStorage.getItem('criteria');
+      if (storedStudents) {
+        allStudents = JSON.parse(storedStudents);
+      }
+      if (storedCriteria) {
+        criteria = JSON.parse(storedCriteria);
+      }
+    }
+    function setupScoreInputs() {
+      // Herhangi bir ekstra input ayarı yapılabilir
+    }
+    function printTables() {
+      window.print();
+    }
+  </script>
+</body>
+</html>

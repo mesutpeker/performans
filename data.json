@@ -1,0 +1,17 @@
+{
+  "classes": [
+    {
+      "name": "9-A",
+      "students": [
+        { "number": "101", "name": "Ahmet Yılmaz", "points": 70 },
+        { "number": "102", "name": "Ayşe Demir", "points": 85 }
+      ]
+    },
+    {
+      "name": "9-B",
+      "students": [
+        { "number": "201", "name": "Mehmet Kaya", "points": 90 }
+      ]
+    }
+  ]
+}
