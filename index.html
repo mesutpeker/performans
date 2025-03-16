@@ -1,0 +1,2127 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Okuma Değerlendirme Tablosu (Dinamik Sınıflar, Sınıf Silme & Düzenleme)</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    /* ========== CSS ========== */
+    * {
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.4;
+      background-color: #f5f5f5;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1200px; 
+      margin: 0 auto;
+      background: #fff; 
+      padding: 20px;
+      border-radius: 8px; 
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* Ana Başlık - 12 punto */
+    .main-title {
+      color: #333; 
+      text-align: center;
+      margin-bottom: 5px; 
+      font-size: 12pt;  
+      line-height: 1.2; 
+      white-space: pre-line;
+    }
+
+    .form-container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 20px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 12px;
+      box-shadow: inset 2px 2px 5px #d1d1d1, inset -2px -2px 5px #ffffff;
+    }
+
+    .title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .student-info-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    /* ========== Input Alanları ========== */
+    .input-long {
+      flex: 1;
+      width: 100%;
+      min-width: 280px;
+      max-width: 100%;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      background: linear-gradient(145deg, #ffffff, #f0f0f0);
+      box-shadow: 5px 5px 10px #d1d1d1, -5px -5px 10px #ffffff;
+      transition: all 0.3s ease;
+    }
+
+    .input-medium {
+      flex: 2;
+      min-width: 200px;
+      max-width: 300px;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      background: linear-gradient(145deg, #ffffff, #f0f0f0);
+      box-shadow: 5px 5px 10px #d1d1d1, -5px -5px 10px #ffffff;
+      transition: all 0.3s ease;
+    }
+
+    .input-short {
+      flex: 1;
+      min-width: 150px;
+      max-width: 180px;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      background: linear-gradient(145deg, #ffffff, #f0f0f0);
+      box-shadow: 5px 5px 10px #d1d1d1, -5px -5px 10px #ffffff;
+      transition: all 0.3s ease;
+    }
+
+    /* Input focus efektleri */
+    .input-long:focus,
+    .input-medium:focus,
+    .input-short:focus {
+      outline: none;
+      box-shadow: inset 5px 5px 10px #d1d1d1, inset -5px -5px 10px #ffffff;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* ====== Sınıf Butonları (Tabs) ====== */
+    .tabs-container {
+      display: flex; 
+      gap: 8px; 
+      margin-bottom: 10px;
+      flex-wrap: wrap; 
+      justify-content: center;
+    }
+    .class-tab-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(145deg, #ffffff, #f0f0f0);
+      padding: 4px;
+      border-radius: 16px;
+      box-shadow: 5px 5px 10px #d1d1d1, -5px -5px 10px #ffffff;
+      transition: all 0.3s ease;
+    }
+    .class-tab-wrapper:hover {
+      transform: translateY(-2px);
+      box-shadow: 6px 6px 12px #c1c1c1, -6px -6px 12px #ffffff;
+    }
+    .tab-btn {
+      background: linear-gradient(145deg, #f0f0f0, #e0e0e0);
+      color: #333;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 30px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 5px 5px 10px #d1d1d1,
+                  -2px -2px 6px #ffffff;
+      transition: all 0.3s ease;
+    }
+    .tab-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 6px 6px 12px #c1c1c1,
+                  -3px -3px 8px #ffffff;
+    }
+    .tab-btn:active {
+      box-shadow: 0 2px 0 #bdbdbd, 0 2px 6px rgba(0,0,0,0.2);
+      transform: translateY(1px);
+    }
+    .tab-btn.active {
+      background: linear-gradient(145deg, #673AB7, #5E35B1);
+      color: white;
+      box-shadow: inset 4px 4px 8px rgba(0,0,0,0.2),
+                  inset -2px -2px 6px rgba(255,255,255,0.1);
+    }
+
+    /* Sınıf düzenle ve sil butonları */
+    .class-edit-btn, .class-delete-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      opacity: 0.7;
+      position: relative;
+      overflow: hidden;
+    }
+    .class-edit-btn {
+      background: linear-gradient(145deg, #4CAF50, #388E3C);
+      color: white;
+    }
+    .class-delete-btn {
+      background: linear-gradient(145deg, #f44336, #d32f2f);
+      color: white;
+    }
+    .class-edit-btn:hover, .class-delete-btn:hover {
+      opacity: 1;
+      transform: translateY(-2px);
+    }
+    .class-edit-btn::before, .class-delete-btn::before {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    .class-edit-btn:hover::before, .class-delete-btn:hover::before {
+      opacity: 1;
+      visibility: visible;
+      bottom: -35px;
+    }
+    .class-edit-btn:active, .class-delete-btn:active {
+      transform: scale(0.95);
+    }
+    .class-edit-btn::after, .class-delete-btn::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+      background-repeat: no-repeat;
+      background-position: 50%;
+      transform: scale(10, 10);
+      opacity: 0;
+      transition: transform .5s, opacity 1s;
+    }
+    .class-edit-btn:active::after, .class-delete-btn:active::after {
+      transform: scale(0, 0);
+      opacity: 0.3;
+      transition: 0s;
+    }
+
+    /* ========== Normal Butonlar ========== */
+    .add-btn {
+      background: linear-gradient(145deg, #4CAF50, #388E3C);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 5px 5px 10px rgba(56, 142, 60, 0.3),
+                  -2px -2px 6px rgba(76, 175, 80, 0.2);
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+    .add-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 6px 6px 12px rgba(56, 142, 60, 0.4),
+                  -3px -3px 8px rgba(76, 175, 80, 0.3);
+    }
+    .add-btn:active {
+      box-shadow: 0 2px 0 #388E3C, 0 2px 6px rgba(0,0,0,0.2);
+      transform: translateY(1px);
+    }
+
+    .print-btn {
+      background: linear-gradient(145deg, #2196F3, #1976D2);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 5px 5px 10px rgba(25, 118, 210, 0.3),
+                  -2px -2px 6px rgba(33, 150, 243, 0.2);
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+    .print-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 6px 6px 12px rgba(25, 118, 210, 0.4),
+                  -3px -3px 8px rgba(33, 150, 243, 0.3);
+    }
+    .print-btn:active {
+      box-shadow: 0 2px 0 #1976D2, 0 2px 6px rgba(0,0,0,0.2);
+      transform: translateY(1px);
+    }
+
+    .clear-btn {
+      background: linear-gradient(145deg, #FF9800, #F57C00);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 5px 5px 10px rgba(245, 124, 0, 0.3),
+                  -2px -2px 6px rgba(255, 152, 0, 0.2);
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+    .clear-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 6px 6px 12px rgba(245, 124, 0, 0.4),
+                  -3px -3px 8px rgba(255, 152, 0, 0.3);
+    }
+    .clear-btn:active {
+      box-shadow: 0 2px 0 #F57C00, 0 2px 6px rgba(0,0,0,0.2);
+      transform: translateY(1px);
+    }
+
+    .edit-criteria-btn {
+      background: linear-gradient(145deg, #9C27B0, #7B1FA2);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 5px 5px 10px rgba(123, 31, 162, 0.3),
+                  -2px -2px 6px rgba(156, 39, 176, 0.2);
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+    .edit-criteria-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 6px 6px 12px rgba(123, 31, 162, 0.4),
+                  -3px -3px 8px rgba(156, 39, 176, 0.3);
+    }
+    .edit-criteria-btn:active {
+      box-shadow: 0 2px 0 #7B1FA2, 0 2px 6px rgba(0,0,0,0.2);
+      transform: translateY(1px);
+    }
+
+    .excel-btn {
+      background: linear-gradient(145deg, #009688, #00796B);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 5px 5px 10px rgba(0, 121, 107, 0.3),
+                  -2px -2px 6px rgba(0, 150, 136, 0.2);
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+    .excel-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 6px 6px 12px rgba(0, 121, 107, 0.4),
+                  -3px -3px 8px rgba(0, 150, 136, 0.3);
+    }
+    .excel-btn:active {
+      box-shadow: 0 2px 0 #00796B, 0 2px 6px rgba(0,0,0,0.2);
+      transform: translateY(1px);
+    }
+
+    /* Tablodaki düzenle ve sil butonları */
+    .edit-btn, .delete-btn {
+      border: none;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 2px;
+      color: white;
+      box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.2);
+    }
+    
+    .edit-btn {
+      background: linear-gradient(145deg, #4CAF50, #388E3C);
+    }
+    
+    .delete-btn {
+      background: linear-gradient(145deg, #f44336, #d32f2f);
+    }
+    
+    .edit-btn:hover, .delete-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    .edit-btn:active, .delete-btn:active {
+      transform: translateY(1px);
+      box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Popup stilleri */
+    .popup {
+      background: white;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      transform: scale(0.9);
+    }
+    
+    .popup-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .popup-header h3 {
+      font-size: 18px;
+      color: #333;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .popup-header h3 i {
+      color: #673AB7;
+    }
+    
+    .popup-close {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: #999;
+      transition: color 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+    }
+    
+    .popup-close:hover {
+      color: #f44336;
+      background: rgba(0,0,0,0.05);
+    }
+    
+    .popup-content {
+      margin-bottom: 20px;
+    }
+    
+    .popup-content input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: all 0.3s;
+      box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    .popup-content input:focus {
+      border-color: #673AB7;
+      box-shadow: 0 0 0 2px rgba(103, 58, 183, 0.2);
+      outline: none;
+    }
+    
+    .popup-content label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #555;
+      font-size: 14px;
+    }
+    
+    .popup-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    
+    .popup-save, .popup-cancel {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .popup-save {
+      background: linear-gradient(145deg, #4CAF50, #388E3C);
+      color: white;
+      box-shadow: 3px 3px 6px rgba(56, 142, 60, 0.3);
+    }
+    
+    .popup-cancel {
+      background: linear-gradient(145deg, #f44336, #d32f2f);
+      color: white;
+      box-shadow: 3px 3px 6px rgba(211, 47, 47, 0.3);
+    }
+    
+    .popup-save:hover, .popup-cancel:hover {
+      transform: translateY(-2px);
+      box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    .popup-save:active, .popup-cancel:active {
+      transform: translateY(1px);
+      box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    /* ========== Tablo ========== */
+    .table-responsive {
+      overflow-x: auto; 
+      margin-bottom: 20px;
+      background: #fff; 
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      max-width: 297mm;
+    }
+    table {
+      width: 100%; 
+      border-collapse: collapse;
+      font-size: 11px; 
+      table-layout: fixed;
+    }
+    th, td {
+      border: 1px solid #ddd; 
+      padding: 4px;
+      text-align: center; 
+      vertical-align: middle;
+      word-wrap: break-word; 
+      overflow-wrap: break-word;
+      white-space: normal;
+    }
+    th {
+      background: #f8f9fa; 
+      font-weight: bold;
+    }
+    .criteria-header {
+      background: #e9ecef; 
+      font-size: 12pt;  
+      font-weight: bold; 
+      padding: 4px;
+    }
+    .criteria-row th {
+      font-size: 9px; 
+      background: #e9ecef; 
+      width: calc((100% - (6% + 14% + 5%)) / 10);
+      min-height: 50px; 
+      height: auto;
+      line-height: 1.2; 
+      padding: 4px;
+      white-space: normal;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      -webkit-hyphens: auto;
+      hyphens: auto;
+    }
+    .student-number-header {
+      width: 6%; 
+      background: #f8f9fa; 
+      font-size: 11px;
+    }
+    .name-header {
+      width: 14%; 
+      background: #f8f9fa; 
+      font-size: 11px;
+    }
+    .total-header {
+      width: 5%; 
+      background: #f8f9fa; 
+      font-size: 11px;
+    }
+    .score-input {
+      width: 100%; 
+      padding: 2px; 
+      border: 1px solid #ddd;
+      border-radius: 2px; 
+      font-size: 11px; 
+      text-align: center;
+    }
+    
+    .total-score-input {
+      width: 100%; 
+      padding: 2px; 
+      border: 1px solid #4CAF50;
+      border-radius: 2px; 
+      font-size: 11px; 
+      text-align: center;
+      background-color: #f0fff0;
+      font-weight: bold;
+      color: #333;
+    }
+    
+    .total-score-input:focus {
+      outline: none;
+      border-color: #2196F3;
+      box-shadow: 0 0 3px rgba(33, 150, 243, 0.5);
+    }
+
+    /* Tek Tablo başlığının ortalanması ve 12 punto ayarı */
+    #dynamicTableTitle {
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 12pt;
+    }
+
+    /* Popup Stilleri */
+    .popup-overlay {
+      display: none; 
+      position: fixed; 
+      top: 0; 
+      left: 0;
+      width: 100%; 
+      height: 100%; 
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 999; 
+      justify-content: center; 
+      align-items: center;
+    }
+    .popup {
+      background: white; 
+      padding: 20px; 
+      border-radius: 8px;
+      width: 90%; 
+      max-width: 400px; 
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .criteria-popup {
+      max-width: 600px; 
+      max-height: 90vh; 
+      overflow-y: auto;
+    }
+    .popup-header {
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .popup-header h3 {
+      margin: 0; 
+      font-size: 16px;
+    }
+    .popup-close {
+      background: none; 
+      border: none; 
+      font-size: 20px; 
+      cursor: pointer;
+      padding: 0; 
+      color: #666;
+    }
+    .popup-content {
+      margin-bottom: 15px;
+    }
+    .popup-content input, .popup-content textarea {
+      width: 100%; 
+      margin-bottom: 10px; 
+      padding: 8px;
+      border: 1px solid #ddd; 
+      border-radius: 4px;
+    }
+    .criteria-content {
+      max-height: calc(90vh - 150px); 
+      overflow-y: auto;
+    }
+    .criteria-input-group {
+      margin-bottom: 15px; 
+      padding: 10px; 
+      background: #f8f9fa; 
+      border-radius: 4px;
+    }
+    .criteria-input-group label {
+      display: block; 
+      margin-bottom: 5px; 
+      font-weight: bold;
+    }
+    .criteria-input-group textarea {
+      width: 100%; 
+      padding: 8px; 
+      border: 1px solid #ddd;
+      border-radius: 4px; 
+      resize: vertical; 
+      min-height: 60px;
+    }
+    .popup-buttons {
+      display: flex; 
+      gap: 10px; 
+      justify-content: flex-end;
+    }
+    .popup-save, .popup-cancel {
+      border-radius: 20px; 
+      font-size: 13px;
+      padding: 6px 12px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+    }
+    .popup-save {
+      background: #4CAF50; 
+      color: white;
+    }
+    .popup-cancel {
+      background: #dc3545; 
+      color: white;
+    }
+    .popup-save:hover, .popup-cancel:hover {
+      transform: translateY(-1px);
+    }
+    .popup-save:active, .popup-cancel:active {
+      transform: translateY(1px);
+    }
+    #editClassPopup .popup-header h3 {
+      font-size: 15px;
+    }
+
+    /* ========== Yazdırma Stilleri ========== */
+    @media print {
+      @page {
+        size: landscape;  /* Yatay A4 */
+        margin: 0.5cm;  /* Kenar boşluklarını azalttım */
+      }
+      
+      body {
+        background: white;
+        padding: 0;
+        margin: 0;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      
+      .container {
+        max-width: none;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        box-shadow: none;
+        background: white;
+      }
+      
+      .form-container, 
+      .class-add-group, 
+      .tabs-container, 
+      .student-info-group, 
+      .button-group,
+      .no-print {
+        display: none !important;
+      }
+      
+      .tables-container {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      
+      .book-table {
+        page-break-inside: avoid;
+        width: 100%;
+      }
+      
+      .table-responsive {
+        overflow: visible;
+        max-width: none;
+        box-shadow: none;
+      }
+      
+      table {
+        width: 100%;
+        font-size: 9pt;  /* Font boyutunu küçülttüm */
+        border-collapse: collapse;
+        table-layout: fixed;
+      }
+      
+      th, td {
+        border: 1px solid #000;
+        padding: 4px 2px;  /* Padding'i azalttım */
+        text-align: center;
+        vertical-align: middle;
+        height: 20px;  /* Sabit yükseklik ekledim */
+        line-height: 1.2;  /* Satır yüksekliğini ayarladım */
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+      
+      .main-title {
+        font-size: 12pt;  /* Font boyutunu küçülttüm */
+        margin-bottom: 8px;
+        text-align: center;
+        font-weight: bold;
+      }
+      
+      #dynamicTableTitle {
+        font-size: 11pt;  /* Font boyutunu küçülttüm */
+        margin-bottom: 4px;
+        text-align: center;
+        font-weight: bold;
+      }
+      
+      .criteria-header {
+        font-size: 11pt;  /* Font boyutunu küçülttüm */
+        background-color: #e9ecef !important;
+        font-weight: bold;
+        height: 25px;  /* Sabit yükseklik ekledim */
+      }
+      
+      .criteria-row th {
+        font-size: 8pt;  /* Font boyutunu küçülttüm */
+        background-color: #f8f9fa !important;
+        font-weight: bold;
+        height: 35px;  /* Sabit yükseklik ekledim */
+        padding: 2px;
+        line-height: 1.1;
+      }
+      
+      .student-number-header {
+        width: 8%;  /* Genişliği artırdım */
+        background-color: #f8f9fa !important;
+        font-weight: bold;
+      }
+      
+      .name-header {
+        width: 16%;  /* Genişliği artırdım */
+        background-color: #f8f9fa !important;
+        font-weight: bold;
+      }
+      
+      .total-header {
+        width: 6%;  /* Genişliği artırdım */
+        background-color: #f8f9fa !important;
+        font-weight: bold;
+      }
+      
+      .score-input {
+        border: none;
+        background: transparent;
+        font-size: 9pt;
+        width: 100%;
+        text-align: center;
+        -webkit-appearance: none;
+        -moz-appearance: textfield;
+        appearance: none;
+        padding: 0;
+      }
+      
+      .total-score-input {
+        border: none;
+        background: transparent;
+        font-size: 9pt;
+        font-weight: bold;
+        width: 100%;
+        text-align: center;
+        -webkit-appearance: none;
+        -moz-appearance: textfield;
+        appearance: none;
+        padding: 0;
+      }
+      
+      /* Kriter sütunlarının genişliklerini eşitle */
+      .criteria-row th {
+        width: 7%;  /* (100% - (8% + 16% + 6%)) / 10 */
+      }
+    }
+
+    /* Puan Dağılımı Önizleme Stilleri */
+    .points-preview-table {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .points-preview-table table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .points-preview-table th, 
+    .points-preview-table td {
+      padding: 8px;
+      text-align: center;
+      border: 1px solid #e0e0e0;
+    }
+    
+    .points-preview-table th {
+      background-color: #f0f0f0;
+      font-weight: bold;
+      font-size: 12px;
+      color: #555;
+    }
+    
+    .points-preview-table td {
+      font-size: 13px;
+      color: #333;
+      transition: background-color 0.2s;
+    }
+    
+    .points-preview-table tr:hover td {
+      background-color: #f9f9f9;
+    }
+    
+    /* Önizleme başlık stilleri */
+    .preview-title {
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #444;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .preview-title i {
+      color: #673AB7;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="form-container">
+      <!-- Ana başlık ve Alt Başlık grubu -->
+      <div class="title-group">
+        <input 
+          type="text" 
+          id="mainTitle" 
+          class="input-long" 
+          placeholder="Ana Başlık"
+          value="KARAMAN MESLEKİ VE TEKNİK ANADOLU LİSESİ TÜRK DİLİ VE EDEBİYATI PERFORMAN DEĞERLENDİRME ÖLÇEĞİ"
+        />
+        <input 
+          type="text" 
+          id="subTitle" 
+          class="input-long" 
+          placeholder="Alt Başlık"
+          value="Performans Değerlendirme Kriterleri"
+        />
+        <input 
+          type="text" 
+          id="tableTitle" 
+          class="input-long" 
+          placeholder="Tablo Başlığı"
+          value="Ders İçi Performans Değerlendirme"
+        />
+      </div>
+
+      <!-- Sınıf eklemek ve seçmek için -->
+      <div class="class-add-group" style="display:flex; gap:10px; align-items:center;">
+        <input 
+          type="text" 
+          id="newClassName" 
+          class="input-medium" 
+          placeholder="Yeni Sınıf Adı (ör. 9-A)"
+        />
+        <button class="excel-btn" onclick="addClass()">Sınıf Ekle</button>
+        <!-- Yeni eklenen sınıf seç menüsü -->
+        <select id="classSelect" onchange="switchClass(this.value)" class="input-medium" aria-label="Sınıf Seçimi">
+          <option value="">-- Sınıf Seçiniz --</option>
+        </select>
+        <!-- Veri Temizleme Butonu -->
+        <button class="excel-btn" onclick="clearLocalStorage()">Verileri Sıfırla</button>
+      </div>
+
+      <!-- Sekme butonları (Sınıflar) + Düzenle / Sil -->
+      <div class="tabs-container" id="tabsContainer"></div>
+
+      <!-- Öğrenci bilgileri grubu -->
+      <div class="student-info-group">
+        <input 
+          type="text" 
+          id="studentNumber" 
+          class="input-short" 
+          placeholder="Öğrenci No" 
+          required
+        />
+        <input 
+          type="text" 
+          id="studentName" 
+          class="input-medium" 
+          placeholder="Öğrenci Adı Soyadı" 
+          required
+        />
+        <input 
+          type="number" 
+          id="studentPoints" 
+          class="input-short" 
+          placeholder="Puan Giriniz" 
+          min="0" 
+          max="100" 
+          step="5" 
+          required
+          oninput="updateAddPointsPreview()"
+        />
+      </div>
+
+      <!-- Puan dağılımı önizleme -->
+      <div id="addPointsPreviewContainer" style="margin-top: 10px; margin-bottom: 10px; display: none;">
+        <div class="preview-title">
+          <i class="fas fa-table"></i> Puan Dağılımı Önizleme
+        </div>
+        <div id="addPointsPreview" class="points-preview-grid"></div>
+      </div>
+
+      <!-- Buton grubu (JSON'dan ekle butonu kaldırıldı) -->
+      <div class="button-group">
+        <button onclick="addStudent()" class="add-btn">Öğrenci Ekle</button>
+        <button onclick="printTables()" class="print-btn">Yazdır</button>
+        <button onclick="clearCurrentClassTable()" class="clear-btn">Tabloyu Temizle</button>
+        <button onclick="editCriteria()" class="edit-criteria-btn">Kriterleri Düzenle</button>
+        <button onclick="openExcelPopup()" class="excel-btn">Excel'den Ekle</button>
+      </div>
+    </div>
+
+    <div class="tables-container">
+      <div class="book-table">
+        <h1 class="main-title"></h1>
+        <h2 class="book-title" id="dynamicTableTitle">Tek Tablo</h2>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th rowspan="2" class="student-number-header">Öğrenci<br>No</th>
+                <th rowspan="2" class="name-header">Öğrenci<br>Adı Soyadı</th>
+                <th colspan="10" class="criteria-header"></th>
+                <th rowspan="2" class="total-header">Toplam</th>
+                <th rowspan="2" class="no-print">İşlem</th>
+              </tr>
+              <tr class="criteria-row" id="criteriaRow">
+                <!-- Kriterler JS ile eklenecek -->
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Düzenleme Popup'ı (Öğrenci) -->
+  <div class="popup-overlay" id="editPopup">
+    <div class="popup">
+      <div class="popup-header">
+        <h3><i class="fas fa-user-edit"></i> Öğrenci Düzenle</h3>
+        <button class="popup-close" onclick="closePopup()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="popup-content">
+        <input type="hidden" id="editStudentIndex" />
+        <label for="editStudentNumber">
+          <i class="fas fa-id-card"></i> Öğrenci Numarası
+        </label>
+        <input type="text" id="editStudentNumber" placeholder="Öğrenci Numarası" required />
+        
+        <label for="editStudentName">
+          <i class="fas fa-user"></i> Öğrenci Adı Soyadı
+        </label>
+        <input type="text" id="editStudentName" placeholder="Öğrenci Adı Soyadı" required />
+        
+        <label for="editPoints">
+          <i class="fas fa-star"></i> Toplam Puan
+        </label>
+        <input 
+          type="number" 
+          id="editPoints" 
+          placeholder="Toplam Puan" 
+          min="0" 
+          max="100" 
+          step="5" 
+          required
+          oninput="updatePointsPreview()"
+        />
+        
+        <div id="pointsPreviewContainer" style="margin-top: 15px; display: none;">
+          <label class="preview-title">
+            <i class="fas fa-table"></i> Puan Dağılımı Önizleme
+          </label>
+          <div id="pointsPreview" class="points-preview-grid"></div>
+        </div>
+      </div>
+      <div class="popup-buttons">
+        <button onclick="closePopup()" class="popup-cancel">
+          <i class="fas fa-times"></i> İptal
+        </button>
+        <button onclick="saveEdit()" class="popup-save">
+          <i class="fas fa-check"></i> Kaydet
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Kriterler Düzenleme Popup'ı -->
+  <div class="popup-overlay" id="criteriaPopup">
+    <div class="popup criteria-popup">
+      <div class="popup-header">
+        <h3><i class="fas fa-tasks"></i> Kriterleri Düzenle</h3>
+        <button class="popup-close" onclick="closeCriteriaPopup()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="criteria-content">
+        <div id="criteriaInputs"></div>
+      </div>
+      <div class="popup-buttons">
+        <button onclick="closeCriteriaPopup()" class="popup-cancel">
+          <i class="fas fa-times"></i> İptal
+        </button>
+        <button onclick="saveCriteria()" class="popup-save">
+          <i class="fas fa-check"></i> Kaydet
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Excel'den Ekle Popup'ı -->
+  <div class="popup-overlay" id="excelPopup">
+    <div class="popup excel-popup">
+      <div class="popup-header">
+        <h3><i class="fas fa-file-excel"></i> Excel'den Veri Ekle</h3>
+        <button class="popup-close" onclick="closeExcelPopup()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="excel-instructions">
+        <h4><i class="fas fa-info-circle"></i> Nasıl Kullanılır?</h4>
+        <ul>
+          <li><i class="fas fa-check"></i> Excel'den öğrenci listesini kopyalayın</li>
+          <li><i class="fas fa-check"></i> Her satır bir öğrenci bilgisi içermeli</li>
+          <li><i class="fas fa-check"></i> Format şu şekilde olmalı:</li>
+        </ul>
+        <div class="example">
+          123  Ahmet Yılmaz<br>
+          124  Ayşe Demir<br>
+          125  Mehmet Kaya
+        </div>
+      </div>
+
+      <textarea 
+        id="excelText" 
+        placeholder="Excel'den kopyaladığınız öğrenci listesini buraya yapıştırın..."
+      ></textarea>
+      
+      <div style="margin-top: 15px;">
+        <label for="excelDefaultPoints">
+          <i class="fas fa-star"></i> Varsayılan Puan:
+        </label>
+        <input 
+          type="number" 
+          id="excelDefaultPoints" 
+          value="50" 
+          min="0" 
+          max="100" 
+          step="5"
+          style="width: 80px; padding: 8px; border-radius: 4px; border: 1px solid #ddd;"
+          oninput="updateExcelPointsPreview()"
+        />
+      </div>
+      
+      <!-- Excel puan dağılımı önizleme -->
+      <div id="excelPointsPreviewContainer" style="margin-top: 15px; display: block;">
+        <div class="preview-title">
+          <i class="fas fa-table"></i> Puan Dağılımı Önizleme
+        </div>
+        <div id="excelPointsPreview" class="points-preview-grid"></div>
+      </div>
+
+      <div class="popup-buttons">
+        <button onclick="closeExcelPopup()" class="popup-cancel">
+          <i class="fas fa-times"></i> İptal
+        </button>
+        <button onclick="parseExcelText()" class="popup-save">
+          <i class="fas fa-check"></i> Kaydet
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sınıf Düzenleme Popup'ı -->
+  <div class="popup-overlay" id="editClassPopup">
+    <div class="popup class-edit-popup">
+      <div class="popup-header">
+        <h3><i class="fas fa-edit"></i> Sınıf Düzenle</h3>
+        <button class="popup-close" onclick="closeEditClassPopup()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="popup-content">
+        <input type="hidden" id="oldClassName" />
+        <label for="newClassNameInput">
+          <i class="fas fa-school"></i> Yeni Sınıf Adı
+        </label>
+        <input 
+          type="text" 
+          id="newClassNameInput" 
+          placeholder="Örn: 9-B" 
+          required 
+        />
+      </div>
+      <div class="popup-buttons">
+        <button onclick="closeEditClassPopup()" class="popup-cancel">
+          <i class="fas fa-times"></i> İptal
+        </button>
+        <button onclick="saveClassEdit()" class="popup-save">
+          <i class="fas fa-check"></i> Kaydet
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ========== JavaScript ========== */
+
+    let allStudents = {}; 
+    let currentClass = null; 
+    
+    // Uygulama sürüm numarası - her güncelleme yaptığınızda bu değeri artırın
+    const APP_VERSION = "1.0.1";
+
+    const defaultCriteria = [
+      "1. Planlama",
+      "2. Akıcı Konuşma",
+      "3. Zaman Yönetimi",
+      "4. Anlatım Netliği",
+      "5. Beden Dili Kullanımı",
+      "6. Göz Teması Kurma",
+      "7. Ses Tonunu Etkili Kullanma",
+      "8. Dili Etkili Kullanma",
+      "9. Konuya Hakimiyet",
+      "10. Dinleyici İlgisini Canlı Tutma"
+    ];
+    let criteria = [...defaultCriteria];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateTitles();
+      updateCriteriaDisplay();
+      setupScoreInputs();
+      
+      // GitHub'dan veya yerel JSON dosyasından verileri yükle
+      const jsonUrl = 'data.json';
+      
+      fetch(jsonUrl)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Veri yüklenemedi');
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Yüklenen JSON verisi:', data);
+          importJsonData(data);
+          // Veriler yüklendikten sonra UI'ı güncelle
+          rebuildTabs();
+          updateClassSelectMenu();
+        })
+        .catch(err => {
+          console.error("Veri yüklenirken hata:", err);
+          // Hata durumunda varsayılan verileri kullan
+          const defaultData = {
+            "classes": [
+              {
+                "name": "9-A",
+                "students": [
+                  { "number": "101", "name": "Ahmet Yılmaz", "points": 70 },
+                  { "number": "102", "name": "Ayşe Demir", "points": 85 }
+                ]
+              }
+            ]
+          };
+          importJsonData(defaultData);
+          // Varsayılan veriler yüklendikten sonra UI'ı güncelle
+          rebuildTabs();
+          updateClassSelectMenu();
+        });
+    });
+
+    /* Sınıf seç menüsünü güncelle */
+    function updateClassSelectMenu() {
+      console.log('updateClassSelectMenu çağrıldı'); // Debug için log
+      const select = document.getElementById('classSelect');
+      select.innerHTML = '<option value="">-- Sınıf Seçiniz --</option>';
+      
+      // Sınıfları alfabetik sıraya göre sırala
+      const sortedClasses = Object.keys(allStudents).sort();
+      console.log('Sıralanmış sınıflar:', sortedClasses); // Debug için log
+      
+      sortedClasses.forEach(cls => {
+        const option = document.createElement('option');
+        option.value = cls;
+        option.textContent = cls;
+        select.appendChild(option);
+      });
+      
+      // Eğer bir sınıf seçili değilse ve sınıflar varsa, ilk sınıfı seç
+      if (!currentClass && sortedClasses.length > 0) {
+        currentClass = sortedClasses[0];
+        select.value = currentClass;
+        rebuildTabs();
+        updateTable();
+      }
+    }
+
+    /* ========== Sınıf Ekle/Sil/Düzenle ========== */
+    function addClass() {
+      const classNameInput = document.getElementById('newClassName');
+      const cls = classNameInput.value.trim();
+      if(!cls) {
+        alert("Lütfen sınıf adını giriniz (örn: 9-A).");
+        return;
+      }
+      if(allStudents[cls]) {
+        alert("Bu sınıf zaten mevcut: " + cls);
+        return;
+      }
+      allStudents[cls] = [];
+      classNameInput.value = '';
+      rebuildTabs();
+      updateClassSelectMenu();
+      switchClass(cls);
+      saveToLocalStorage();
+    }
+    function deleteClass(cls) {
+      if(!allStudents[cls]) return;
+      if(!confirm(`${cls} sınıfını tamamen silmek istediğinize emin misiniz?`)) {
+        return;
+      }
+      delete allStudents[cls];
+      if(cls === currentClass) {
+        const remaining = Object.keys(allStudents);
+        currentClass = remaining.length ? remaining[0] : null;
+      }
+      rebuildTabs();
+      updateClassSelectMenu();
+      updateTable();
+      saveToLocalStorage();
+    }
+    function editClass(cls) {
+      document.getElementById('oldClassName').value = cls;
+      document.getElementById('newClassNameInput').value = cls;
+      const popup = document.getElementById('editClassPopup');
+      popup.style.display = 'flex';
+      setTimeout(() => {
+        popup.classList.add('active');
+      }, 10);
+    }
+    function closeEditClassPopup() {
+      const popup = document.getElementById('editClassPopup');
+      popup.classList.remove('active');
+      setTimeout(() => {
+        popup.style.display = 'none';
+      }, 300);
+    }
+    function saveClassEdit() {
+      const oldName = document.getElementById('oldClassName').value;
+      const newName = document.getElementById('newClassNameInput').value.trim();
+      if(!newName) {
+        alert("Yeni sınıf adı boş olamaz!");
+        return;
+      }
+      if(oldName === newName) {
+        closeEditClassPopup();
+        return;
+      }
+      if(allStudents[newName]) {
+        alert("Bu sınıf adı zaten var: " + newName);
+        return;
+      }
+      allStudents[newName] = allStudents[oldName];
+      delete allStudents[oldName];
+      if(currentClass === oldName) {
+        currentClass = newName;
+      }
+      closeEditClassPopup();
+      rebuildTabs();
+      updateClassSelectMenu();
+      updateTable();
+      saveToLocalStorage();
+    }
+    function rebuildTabs() {
+      const tabsContainer = document.getElementById('tabsContainer');
+      tabsContainer.innerHTML = '';
+      
+      // Eğer bir sınıf seçilmişse, sadece o sınıfın butonunu göster
+      if (currentClass && allStudents[currentClass]) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'class-tab-wrapper';
+
+        const btn = document.createElement('button');
+        btn.classList.add('tab-btn', 'active');
+        btn.textContent = currentClass;
+        btn.onclick = () => switchClass(currentClass);
+
+        const editBtn = document.createElement('button');
+        editBtn.className = 'class-edit-btn';
+        editBtn.textContent = '✎';
+        editBtn.title = 'Sınıfı Düzenle';
+        editBtn.onclick = (e) => {
+          e.stopPropagation();
+          editClass(currentClass);
+        };
+
+        const delBtn = document.createElement('button');
+        delBtn.className = 'class-delete-btn';
+        delBtn.textContent = '✕';
+        delBtn.title = 'Sınıfı Sil';
+        delBtn.onclick = (e) => {
+          e.stopPropagation();
+          deleteClass(currentClass);
+        };
+
+        wrapper.appendChild(btn);
+        wrapper.appendChild(editBtn);
+        wrapper.appendChild(delBtn);
+        tabsContainer.appendChild(wrapper);
+      }
+    }
+    function switchClass(cls) {
+      currentClass = cls;
+      rebuildTabs();
+      updateTable();
+      document.getElementById("classSelect").value = cls;
+    }
+
+    /* ========== Öğrenci Ekle ========== */
+    window.addStudent = function() {
+      if(!currentClass) {
+        alert("Lütfen önce bir sınıf ekleyin ve seçin!");
+        return;
+      }
+      const numberInput = document.getElementById('studentNumber');
+      const nameInput = document.getElementById('studentName');
+      const pointsInput = document.getElementById('studentPoints');
+
+      const number = numberInput.value.trim();
+      const name = nameInput.value.trim();
+      const totalPoints = parseInt(pointsInput.value);
+
+      if (!number) {
+        alert('Lütfen öğrenci numarasını giriniz');
+        return;
+      }
+      if (!name) {
+        alert('Lütfen öğrenci adını giriniz');
+        return;
+      }
+      if (isNaN(totalPoints) || totalPoints < 0 || totalPoints > 100) {
+        alert('Lütfen 0-100 arası puan giriniz');
+        return;
+      }
+      if(allStudents[currentClass].some(stu => stu.number === number)) {
+        alert("Bu numarada bir öğrenci zaten mevcut: " + currentClass);
+        return;
+      }
+      
+      // Toplam puanı 5'in katı yap
+      const roundedTotal = Math.round(totalPoints / 5) * 5;
+      
+      allStudents[currentClass].push({
+        number,
+        name,
+        scores: randomDistributeCriteriaPoints(roundedTotal)
+      });
+      updateTable();
+      saveToLocalStorage();
+      numberInput.value = '';
+      nameInput.value = '';
+      pointsInput.value = '';
+    };
+
+    /* ========== Tabloyu Temizle ========== */
+    window.clearCurrentClassTable = function() {
+      if(!currentClass) {
+        alert("Önce bir sınıf ekleyip seçmelisiniz!");
+        return;
+      }
+      if(confirm(`${currentClass} adlı sınıfın tablosunu temizlemek istediğinize emin misiniz?`)) {
+        allStudents[currentClass] = [];
+        updateTable();
+        saveToLocalStorage();
+      }
+    };
+
+    /* ========== Excel'den Ekle ========== */
+    function openExcelPopup() {
+      if(!currentClass) {
+        alert("Lütfen önce bir sınıf ekleyin ve seçin!");
+        return;
+      }
+      const popup = document.getElementById('excelPopup');
+      popup.style.display = 'flex';
+      setTimeout(() => {
+        popup.classList.add('active');
+        updateExcelPointsPreview(); // Önizlemeyi göster
+      }, 10);
+    }
+    function closeExcelPopup() {
+      const popup = document.getElementById('excelPopup');
+      popup.classList.remove('active');
+      setTimeout(() => {
+        popup.style.display = 'none';
+        document.getElementById('excelText').value = '';
+      }, 300);
+    }
+    window.parseExcelText = function() {
+      if(!currentClass) return;
+      const textArea = document.getElementById('excelText');
+      const rawText = textArea.value.trim();
+      if(!rawText) {
+        alert("Lütfen Excel'den kopyaladığınız satırları yapıştırın.");
+        return;
+      }
+      
+      // Varsayılan puanı al ve 5'in katı yap
+      let defaultPoints = parseInt(document.getElementById('excelDefaultPoints').value) || 50;
+      defaultPoints = Math.round(defaultPoints / 5) * 5;
+      
+      const lines = rawText.split('\n').map(line => line.trim()).filter(Boolean);
+      let addedCount = 0;
+      lines.forEach(line => {
+        const parts = line.split(/\s+/).filter(Boolean);
+        if(parts.length >= 2) { // En az 2 parça olmalı (numara ve isim)
+          const studentNumber = parts[0];
+          const studentName = parts.slice(1).join(' '); // Geri kalan tüm parçaları isim olarak al
+          
+          if(!allStudents[currentClass].some(s => s.number === studentNumber)) {
+            allStudents[currentClass].push({
+              number: studentNumber,
+              name: studentName.trim(),
+              scores: distributeCriteriaPoints(defaultPoints)
+            });
+            addedCount++;
+          }
+        }
+      });
+      if(addedCount > 0) {
+        updateTable();
+        saveToLocalStorage();
+        alert(`Toplam ${addedCount} öğrenci eklendi (Sınıf: ${currentClass}).`);
+      } else {
+        alert("Eklenebilecek yeni öğrenci yok veya hepsi zaten kayıtlı.");
+      }
+      closeExcelPopup();
+    };
+    
+    // Excel puan önizleme fonksiyonu
+    window.updateExcelPointsPreview = function() {
+      const totalPoints = parseInt(document.getElementById('excelDefaultPoints').value) || 50;
+      const previewDiv = document.getElementById('excelPointsPreview');
+      
+      // Toplam puanı 5'in katı yap
+      const roundedTotal = Math.round(totalPoints / 5) * 5;
+      
+      const distributedPoints = distributeCriteriaPoints(roundedTotal);
+      
+      previewDiv.innerHTML = '';
+      
+      // Puan dağılımını göster
+      let html = '<div class="points-preview-table">';
+      html += '<table style="width:100%; border-collapse: collapse; margin-top: 5px;">';
+      html += '<tr style="background-color: #f5f5f5;">';
+      
+      // Kriter başlıkları
+      for (let i = 0; i < 10; i++) {
+        html += `<th style="padding: 5px; border: 1px solid #ddd; font-size: 12px; text-align: center;">K${i+1}</th>`;
+      }
+      html += '</tr><tr>';
+      
+      // Puan değerleri
+      distributedPoints.forEach(point => {
+        html += `<td style="padding: 5px; border: 1px solid #ddd; font-size: 12px; text-align: center;">${point}</td>`;
+      });
+      
+      html += '</tr></table>';
+      html += '<div style="display: flex; justify-content: space-between; margin-top: 5px;">';
+      html += '<button onclick="updateExcelPointsPreview()" style="background: #673AB7; color: white; border: none; border-radius: 4px; padding: 3px 8px; font-size: 11px; cursor: pointer;"><i class="fas fa-random"></i> Yeniden Dağıt</button>';
+      html += '<div style="font-size: 12px; color: #666;">Toplam: ' + roundedTotal + '</div>';
+      html += '</div>';
+      html += '</div>';
+      
+      previewDiv.innerHTML = html;
+    };
+
+    /* ========== JSON'dan Ekle Fonksiyonu ========== */
+    function importJsonData(data) {
+      console.log('importJsonData çağrıldı:', data);
+      
+      if(!data.classes || !Array.isArray(data.classes)) {
+        console.error("JSON formatı hatalı! 'classes' dizisi bulunamadı.");
+        return;
+      }
+      
+      // Mevcut verileri temizle
+      allStudents = {};
+      
+      data.classes.forEach(clsObj => {
+        if(!clsObj.name || !clsObj.students || !Array.isArray(clsObj.students)) {
+          console.warn('Geçersiz sınıf verisi:', clsObj);
+          return;
+        }
+        
+        const className = clsObj.name.trim();
+        console.log('Sınıf ekleniyor:', className);
+        allStudents[className] = [];
+        
+        clsObj.students.forEach(stuObj => {
+          if(!stuObj.number || !stuObj.name) {
+            console.warn('Geçersiz öğrenci verisi:', stuObj);
+            return;
+          }
+          
+          // Puanı 5'in katı yap ve varsayılan olarak 0 kullan
+          const points = stuObj.points ? Math.round(parseInt(stuObj.points) / 5) * 5 : 0;
+          
+          allStudents[className].push({
+            number: stuObj.number,
+            name: stuObj.name,
+            scores: distributeCriteriaPoints(points)
+          });
+        });
+      });
+
+      console.log('İşlenmiş veriler:', allStudents);
+      updateTable();
+    }
+
+    /* ========== Öğrenci Düzenleme Fonksiyonları ========== */
+    window.editStudent = function(index) {
+      if(!currentClass) return;
+      const student = allStudents[currentClass][index];
+      const popup = document.getElementById('editPopup');
+      document.getElementById('editStudentIndex').value = index;
+      document.getElementById('editStudentNumber').value = student.number;
+      document.getElementById('editStudentName').value = student.name;
+      const totalPoints = student.scores.reduce((a,b)=>a+b,0);
+      document.getElementById('editPoints').value = totalPoints;
+      updatePointsPreview(); // Önizlemeyi güncelle
+      popup.style.display = 'flex';
+    };
+    window.closePopup = function() {
+      document.getElementById('editPopup').style.display = 'none';
+    };
+    window.saveEdit = function() {
+      if(!currentClass) return;
+      const index = parseInt(document.getElementById('editStudentIndex').value);
+      const number = document.getElementById('editStudentNumber').value.trim();
+      const name = document.getElementById('editStudentName').value.trim();
+      const totalPoints = parseInt(document.getElementById('editPoints').value);
+
+      if(!number || !name) {
+        alert("Geçersiz veri! Öğrenci numarası ve adı gereklidir.");
+        return;
+      }
+      
+      if(isNaN(totalPoints) || totalPoints < 0 || totalPoints > 100) {
+        alert("Geçersiz puan! 0-100 arası bir değer giriniz.");
+        return;
+      }
+      
+      if(allStudents[currentClass].some((stu, i) => i!==index && stu.number===number)) {
+        alert("Bu numara zaten var: " + number);
+        return;
+      }
+      
+      // Toplam puanı 5'in katı yap
+      const roundedTotal = Math.round(totalPoints / 5) * 5;
+      
+      allStudents[currentClass][index] = {
+        number,
+        name,
+        scores: randomDistributeCriteriaPoints(roundedTotal)
+      };
+      updateTable();
+      saveToLocalStorage();
+      closePopup();
+    };
+    window.deleteStudent = function(index) {
+      if(!currentClass) return;
+      if(confirm("Bu öğrenciyi silmek istediğinize emin misiniz?")) {
+        allStudents[currentClass].splice(index, 1);
+        updateTable();
+        saveToLocalStorage();
+      }
+    };
+
+    // Puan önizleme fonksiyonu
+    window.updatePointsPreview = function() {
+      const totalPoints = parseInt(document.getElementById('editPoints').value) || 0;
+      const previewContainer = document.getElementById('pointsPreviewContainer');
+      const previewDiv = document.getElementById('pointsPreview');
+      
+      if (totalPoints <= 0 || totalPoints > 100) {
+        previewContainer.style.display = 'none';
+        return;
+      }
+      
+      // Toplam puanı 5'in katı yap
+      const roundedTotal = Math.round(totalPoints / 5) * 5;
+      
+      const distributedPoints = randomDistributeCriteriaPoints(roundedTotal);
+      
+      previewDiv.innerHTML = '';
+      previewContainer.style.display = 'block';
+      
+      // Puan dağılımını göster
+      let html = '<div class="points-preview-table">';
+      html += '<table style="width:100%; border-collapse: collapse; margin-top: 10px;">';
+      html += '<tr style="background-color: #f5f5f5;">';
+      
+      // Kriter başlıkları
+      for (let i = 0; i < 10; i++) {
+        html += `<th style="padding: 5px; border: 1px solid #ddd; font-size: 12px; text-align: center;">K${i+1}</th>`;
+      }
+      html += '</tr><tr>';
+      
+      // Puan değerleri
+      distributedPoints.forEach(point => {
+        html += `<td style="padding: 5px; border: 1px solid #ddd; font-size: 12px; text-align: center;">${point}</td>`;
+      });
+      
+      html += '</tr></table>';
+      html += '<div style="display: flex; justify-content: space-between; margin-top: 5px;">';
+      html += '<button onclick="updatePointsPreview()" style="background: #673AB7; color: white; border: none; border-radius: 4px; padding: 3px 8px; font-size: 11px; cursor: pointer;"><i class="fas fa-random"></i> Yeniden Dağıt</button>';
+      html += '<div style="font-size: 12px; color: #666;">Toplam: ' + roundedTotal + '</div>';
+      html += '</div>';
+      html += '</div>';
+      
+      previewDiv.innerHTML = html;
+    };
+
+    /* ========== Kriter Düzenleme ========== */
+    window.editCriteria = function() {
+      const popup = document.getElementById('criteriaPopup');
+      const inputsContainer = document.getElementById('criteriaInputs');
+      inputsContainer.innerHTML = '';
+      criteria.forEach((criterion, i) => {
+        const group = document.createElement('div');
+        group.className = 'criteria-input-group';
+        const label = document.createElement('label');
+        label.innerHTML = `<i class="fas fa-check-circle"></i> Kriter ${i+1}:`;
+        const textarea = document.createElement('textarea');
+        textarea.value = criterion.replace(/\n/g,' ');
+        textarea.id = `criterion${i}`;
+        group.appendChild(label);
+        group.appendChild(textarea);
+        inputsContainer.appendChild(group);
+      });
+      popup.style.display = 'flex';
+      setTimeout(() => {
+        popup.classList.add('active');
+      }, 10);
+    };
+    window.closeCriteriaPopup = function() {
+      document.getElementById('criteriaPopup').style.display = 'none';
+    };
+    window.saveCriteria = function() {
+      criteria = Array.from({ length: 10 }, (_, i) => {
+        const ta = document.getElementById(`criterion${i}`);
+        const words = ta.value.trim().split(' ');
+        let lines = [];
+        let currentLine = [];
+        let currentLength = 0;
+        
+        // Her kelimeyi kontrol et ve uygun şekilde satırlara böl
+        words.forEach(word => {
+          // Eğer kelime tek başına çok uzunsa, uygun yerlerden böl
+          if (word.length > 12) {
+            if (currentLine.length > 0) {
+              lines.push(currentLine.join(' '));
+              currentLine = [];
+              currentLength = 0;
+            }
+            // Uzun kelimeyi uygun yerlerden böl
+            const parts = word.match(/.{1,12}/g) || [word];
+            parts.forEach((part, index) => {
+              if (index < parts.length - 1) {
+                lines.push(part + '-');
+              } else {
+                currentLine = [part];
+                currentLength = part.length;
+              }
+            });
+          }
+          // Normal kelime işleme
+          else if (currentLength + word.length > 12) {
+            lines.push(currentLine.join(' '));
+            currentLine = [word];
+            currentLength = word.length;
+          } else {
+            currentLine.push(word);
+            currentLength += word.length + 1;
+          }
+        });
+        
+        // Kalan kelimeleri son satır olarak ekle
+        if (currentLine.length > 0) {
+          lines.push(currentLine.join(' '));
+        }
+        
+        return lines.join('\n');
+      });
+      updateCriteriaDisplay();
+      saveToLocalStorage();
+      closeCriteriaPopup();
+    };
+
+    /* ========== Tablo / Title / Kriterler ========== */
+    function updateTable() {
+      const tbody = document.getElementById('tableBody');
+      if(!tbody) return;
+      tbody.innerHTML = '';
+      if(!currentClass || !allStudents[currentClass]) {
+        return;
+      }
+      let arr = allStudents[currentClass];
+      arr.forEach((stu, idx) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${stu.number}</td><td>${stu.name}</td>`;
+        stu.scores.forEach((score, ci) => {
+          row.innerHTML += `
+            <td>
+              <input 
+                type="number" 
+                class="score-input"
+                value="${score}" 
+                min="0" 
+                max="10"
+                data-info="${currentClass}-${idx}-${ci}"
+                data-value="${score}"
+                onchange="updateScore(this)"
+              />
+            </td>`;
+        });
+        const total = stu.scores.reduce((a,b)=>a+b,0);
+        row.innerHTML += `
+          <td>
+            <input 
+              type="text" 
+              class="total-score-input"
+              value="${total}" 
+              readonly
+              style="background-color: #f5f5f5;"
+            />
+          </td>
+          <td class="no-print">
+            <button onclick="editStudent(${idx})" class="edit-btn"><i class="fas fa-edit"></i> Düzenle</button>
+            <button onclick="deleteStudent(${idx})" class="delete-btn"><i class="fas fa-trash-alt"></i> Sil</button>
+          </td>`;
+        tbody.appendChild(row);
+      });
+    }
+
+    // Bireysel puan güncelleme işleyicisi
+    window.updateScore = function(input) {
+      const info = input.dataset.info.split('-');
+      const cls = info[0];
+      const studentIdx = parseInt(info[1]);
+      const scoreIdx = parseInt(info[2]);
+      const newValue = parseInt(input.value) || 0;
+      
+      // Değeri güncelle
+      allStudents[cls][studentIdx].scores[scoreIdx] = newValue;
+      input.dataset.value = newValue;
+      
+      // Toplam puanı güncelle
+      const row = input.closest('tr');
+      const total = allStudents[cls][studentIdx].scores.reduce((a,b)=>a+b,0);
+      const totalInput = row.querySelector('.total-score-input');
+      totalInput.value = total;
+      totalInput.dataset.value = total;
+      
+      saveToLocalStorage();
+    };
+
+    // Boş bırakılan toplam puan alanını kontrol et
+    window.handleEmptyTotal = function(input) {
+      if (input.value.trim() === '') {
+        input.value = '0';
+        updateTotalScore(input);
+      }
+    };
+
+    // Toplam puan güncelleme işleyicisi
+    window.updateTotalScore = function(input) {
+      try {
+        const info = input.dataset.student.split('-');
+        const cls = info[0];
+        const studentIdx = parseInt(info[1]);
+        
+        // Boş değer kontrolü
+        if (input.value.trim() === '') {
+          return;
+        }
+        
+        // Sayısal değer kontrolü
+        let newTotal = parseInt(input.value) || 0;
+        
+        // 100'den büyük değerleri sınırla
+        if (newTotal > 100) {
+          newTotal = 100;
+        }
+        
+        // 5'in katına yuvarlama
+        const roundedTotal = Math.round(newTotal / 5) * 5;
+        
+        // Öğrenci verilerini güncelle
+        if (allStudents[cls] && allStudents[cls][studentIdx]) {
+          // Puanları dağıt
+          const scores = distributeCriteriaPoints(roundedTotal);
+          
+          // Toplam puanı güncelle
+          input.value = roundedTotal;
+          
+          // Öğrenci verilerini güncelle
+          allStudents[cls][studentIdx].scores = scores;
+          
+          // Kriter puanlarını güncelle
+          const row = input.closest('tr');
+          const scoreInputs = row.querySelectorAll('.score-input');
+          
+          scoreInputs.forEach((input, index) => {
+            input.value = scores[index];
+          });
+          
+          saveToLocalStorage();
+        }
+      } catch (error) {
+        console.error("Puan güncellenirken hata:", error);
+      }
+    };
+
+    function distributeCriteriaPoints(total) {
+      // 0 kontrolü
+      if (total <= 0) {
+        return Array(10).fill(0);
+      }
+      
+      // 100 kontrolü
+      if (total > 100) {
+        total = 100;
+      }
+      
+      // Her kritere eşit dağıtılacak temel puanı hesapla
+      const basePoint = Math.floor(total / 10);
+      let remaining = total - (basePoint * 10);
+      
+      // Temel puanları dağıt
+      const scores = Array(10).fill(basePoint);
+      
+      // Kalan puanları dağıt
+      let index = 0;
+      while (remaining > 0) {
+        if (scores[index] < 10) {
+          scores[index]++;
+          remaining--;
+        }
+        index = (index + 1) % 10;
+      }
+      
+      return scores;
+    }
+
+    // Rastgele puan dağıtım fonksiyonu
+    function randomDistributeCriteriaPoints(total) {
+      if (total <= 0) {
+        return Array(10).fill(0);
+      }
+      
+      if (total > 100) {
+        total = 100;
+      }
+      
+      const scores = Array(10).fill(0);
+      let remaining = total;
+      
+      // Her kritere rastgele puan dağıt (5'in katları olarak)
+      while (remaining > 0) {
+        for (let i = 0; i < 10 && remaining > 0; i++) {
+          if (scores[i] < 10) {
+            const maxAdd = Math.min(5, remaining, 10 - scores[i]);
+            scores[i] += maxAdd;
+            remaining -= maxAdd;
+          }
+        }
+        
+        // Eğer hala dağıtılacak puan kaldıysa ve hiçbir kriter 10'dan küçük değilse, döngüyü sonlandır
+        if (remaining > 0 && scores.every(score => score >= 10)) {
+          break;
+        }
+      }
+      
+      // Puanları karıştır
+      for (let i = scores.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [scores[i], scores[j]] = [scores[j], scores[i]];
+      }
+      
+      return scores;
+    }
+
+    /* ========== LocalStorage İşlemleri ========== */
+    function saveToLocalStorage() {
+      // LocalStorage kullanımını kaldırdık
+      return;
+    }
+    
+    function loadFromLocalStorage() {
+      // LocalStorage kullanımını kaldırdık
+      return;
+    }
+
+    function clearLocalStorage() {
+      if (confirm("Sayfayı yenilemek istediğinize emin misiniz?")) {
+        location.reload();
+      }
+    }
+
+    function updateTitles() {
+      const mainTitle = document.getElementById('mainTitle').value;
+      const subTitle = document.getElementById('subTitle').value;
+      const tableTitle = document.getElementById('tableTitle').value;
+
+      document.querySelector('.main-title').textContent = mainTitle;
+      document.querySelector('.criteria-header').textContent = subTitle;
+      document.getElementById('dynamicTableTitle').textContent = tableTitle;
+    }
+
+    function updateCriteriaDisplay() {
+      const row = document.getElementById('criteriaRow');
+      row.innerHTML = '';
+      criteria.forEach(cr => {
+        const th = document.createElement('th');
+        th.innerHTML = cr;
+        row.appendChild(th);
+      });
+      updateTable();
+    }
+
+    function setupScoreInputs() {
+      // Herhangi bir ekstra input ayarı yapılabilir
+    }
+    function printTables() {
+      // Yazdırma öncesi hazırlık
+      const tableTitle = document.getElementById('dynamicTableTitle').textContent;
+      const currentClassName = currentClass || '';
+      
+      // Yazdırma sırasında tablo başlığını güncelle
+      if (currentClassName) {
+        document.getElementById('dynamicTableTitle').textContent = `${tableTitle} - ${currentClassName}`;
+      }
+      
+      // Yazdırma işlemini başlat
+      window.print();
+      
+      // Yazdırma sonrası tablo başlığını eski haline getir
+      setTimeout(() => {
+        document.getElementById('dynamicTableTitle').textContent = tableTitle;
+      }, 500);
+    }
+
+    /* Verileri Sıfırlama Fonksiyonu */
+    function clearLocalStorage() {
+      if (confirm("Tüm yerel verileri sıfırlamak istediğinize emin misiniz? Bu işlem geri alınamaz.")) {
+        localStorage.clear();
+        alert("Veriler sıfırlandı. Sayfa yeniden yüklenecek.");
+        location.reload();
+      }
+    }
+
+    // Ekleme formundaki puan önizleme fonksiyonu
+    window.updateAddPointsPreview = function() {
+      const totalPoints = parseInt(document.getElementById('studentPoints').value) || 0;
+      const previewContainer = document.getElementById('addPointsPreviewContainer');
+      const previewDiv = document.getElementById('addPointsPreview');
+      
+      if (totalPoints <= 0 || totalPoints > 100) {
+        previewContainer.style.display = 'none';
+        return;
+      }
+      
+      // Toplam puanı 5'in katı yap
+      const roundedTotal = Math.round(totalPoints / 5) * 5;
+      
+      const distributedPoints = randomDistributeCriteriaPoints(roundedTotal);
+      
+      previewDiv.innerHTML = '';
+      previewContainer.style.display = 'block';
+      
+      // Puan dağılımını göster
+      let html = '<div class="points-preview-table">';
+      html += '<table style="width:100%; border-collapse: collapse; margin-top: 5px;">';
+      html += '<tr style="background-color: #f5f5f5;">';
+      
+      // Kriter başlıkları
+      for (let i = 0; i < 10; i++) {
+        html += `<th style="padding: 5px; border: 1px solid #ddd; font-size: 12px; text-align: center;">K${i+1}</th>`;
+      }
+      html += '</tr><tr>';
+      
+      // Puan değerleri
+      distributedPoints.forEach(point => {
+        html += `<td style="padding: 5px; border: 1px solid #ddd; font-size: 12px; text-align: center;">${point}</td>`;
+      });
+      
+      html += '</tr></table>';
+      html += '<div style="display: flex; justify-content: space-between; margin-top: 5px;">';
+      html += '<button onclick="updateAddPointsPreview()" style="background: #673AB7; color: white; border: none; border-radius: 4px; padding: 3px 8px; font-size: 11px; cursor: pointer;"><i class="fas fa-random"></i> Yeniden Dağıt</button>';
+      html += '<div style="font-size: 12px; color: #666;">Toplam: ' + roundedTotal + '</div>';
+      html += '</div>';
+      html += '</div>';
+      
+      previewDiv.innerHTML = html;
+    };
+  </script>
+</body>
+</html>
+
