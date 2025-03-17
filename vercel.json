@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/zekimira/(.*)",
+      "destination": "https://zekimira.vercel.app/$1"
+    }
+  ]
+}
