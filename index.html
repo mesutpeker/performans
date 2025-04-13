@@ -1,0 +1,2815 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performans Değerlendirme Uygulaması</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6fa;
+        }
+        .container {
+            max-width: 1320px; /* Genişletilmiş konteyner */
+            padding: 10px; /* 20px'ten 10px'e düşürdüm */
+        }
+        
+        /* Mobil uyumluluk için ekstra stiller */
+        @media (max-width: 768px) {
+            .container {
+                padding: 5px;
+                max-width: 100%;
+            }
+            .table-responsive {
+                overflow-x: auto;
+            }
+            .table th, .table td {
+                font-size: 0.8rem;
+                padding: 0.3rem !important;
+            }
+            .btn {
+                padding: 0.375rem 0.5rem;
+                font-size: 0.875rem;
+            }
+            .modal-dialog {
+                margin: 0.5rem;
+            }
+        }
+        
+        .header-card {
+            text-align: center;
+            margin-bottom: 10px;
+            background-color: #ffffff;
+            border-radius: 4px;
+            padding: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            position: relative;
+        }
+        
+        .header-card:hover {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        .settings-card {
+            background-color: #ffffff;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            position: relative;
+        }
+        
+        .settings-card:hover {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        .class-tag {
+            display: inline-block;
+            padding: 6px 12px; /* 8px 15px'ten 6px 12px'e düşürdüm */
+            background-color: #6a3de8;
+            color: white;
+            border-radius: 6px; /* 8px'ten 6px'e düşürdüm */
+            margin: 3px; /* 5px'ten 3px'e düşürdüm */
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        .class-tag:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            background-color: #5a30d0;
+        }
+        .class-tag.active {
+            background-color: #5229b8;
+        }
+        .tag-actions {
+            display: inline-block;
+            margin-left: 5px;
+        }
+        .tag-actions button {
+            border: none;
+            background: none;
+            color: white;
+            font-size: 14px;
+            margin-left: 5px;
+            cursor: pointer;
+        }
+        .table-container {
+            background-color: #edf4ff;
+            border-radius: 20px;
+            overflow-x: auto;
+            margin-top: 20px;
+            box-shadow: 8px 8px 15px rgba(150, 150, 200, 0.4), -8px -8px 15px rgba(255, 255, 255, 0.7);
+        }
+        .table {
+            margin-bottom: 0;
+            width: 100%;
+            table-layout: fixed;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .table th {
+            background-color: #d8e8ff;
+            border-bottom: 2px solid #b0c8f0;
+            color: #000;
+            font-weight: bold;
+        }
+        .table th, .table td {
+            vertical-align: middle;
+            text-align: center;
+            padding: 6px 3px;
+            font-size: 12px;
+            white-space: nowrap;
+            border: 1px solid #c0d8f8;
+        }
+        .table th:first-child, .table td:first-child {
+            width: 60px;
+        }
+        .table th:nth-child(2), .table td:nth-child(2) {
+            width: 120px;
+        }
+        .table th:last-child, .table td:last-child {
+            width: 60px;
+        }
+        .table th:nth-last-child(2), .table td:nth-last-child(2) {
+            width: 50px;
+        }
+        .table th:not(:first-child):not(:nth-child(2)):not(:last-child):not(:nth-last-child(2)), 
+        .table td:not(:first-child):not(:nth-child(2)):not(:last-child):not(:nth-last-child(2)) {
+            width: 70px;
+        }
+        .table input[type="number"] {
+            width: 40px;
+            height: 30px;
+            text-align: center;
+            border: none;
+            padding: 2px;
+            border-radius: 8px;
+            -moz-appearance: textfield;
+            appearance: textfield;
+            background-color: #f2f7ff;
+            box-shadow: inset 2px 2px 3px rgba(0, 0, 0, 0.1), inset -2px -2px 3px rgba(255, 255, 255, 0.5);
+        }
+        .table input[type="number"]:focus {
+            background-color: #ffffff;
+            box-shadow: inset 3px 3px 5px rgba(0, 0, 0, 0.15), inset -3px -3px 5px rgba(255, 255, 255, 0.7);
+            outline: none;
+        }
+        .total-input {
+            width: 50px !important;
+            font-weight: bold;
+            background-color: #d0e0f5 !important;
+            box-shadow: inset 2px 2px 3px rgba(0, 0, 0, 0.1), inset -2px -2px 3px rgba(255, 255, 255, 0.5) !important;
+        }
+        .total-input:focus {
+            background-color: #e0e9fa !important;
+        }
+        
+        /* Modern form elemanları */
+        .form-control, .form-select {
+            background-color: #f5f7fb;
+            border: 1px solid #e0e6f1;
+            border-radius: 8px;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            outline: none;
+            border-color: #6a3de8;
+            box-shadow: 0 0 0 3px rgba(106, 61, 232, 0.15);
+            background-color: #ffffff;
+        }
+        
+        .input-group-text {
+            background-color: #d0e0f5;
+            border: none;
+            border-radius: 10px 0 0 10px;
+            box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Modern butonlar */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-purple {
+            background-color: #6a3de8;
+            color: white;
+        }
+        
+        .btn-purple:hover {
+            background-color: #5a30d0;
+        }
+        
+        .btn-teal {
+            background-color: #00a89d;
+            color: white;
+        }
+        
+        .btn-teal:hover {
+            background-color: #009085;
+        }
+        
+        .btn-success {
+            background-color: #10b981;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #0ea371;
+        }
+        
+        .btn-warning {
+            background-color: #f59e0b;
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background-color: #d88508;
+        }
+        
+        .btn-info {
+            background-color: #0ea5e9;
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background-color: #0c8bcf;
+        }
+        
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+        
+        .btn-edit {
+            color: #28a745;
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0;
+            margin-right: 5px;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-edit:hover {
+            color: #218838;
+            transform: scale(1.2);
+        }
+        
+        .btn-delete {
+            color: #dc3545;
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-delete:hover {
+            color: #c82333;
+            transform: scale(1.2);
+        }
+        
+        .header-title {
+            margin-bottom: 0;
+            font-size: 0.9rem;
+        }
+        
+        /* Başlık içindeki span'lar için boyutu küçülttüm */
+        #main-title, #performance-title, #evaluation-title {
+            font-size: 0.9rem;
+            padding: 4px 0;
+            border-bottom: none !important;
+            position: relative;
+            color: #333333;
+            display: inline-block;
+            background: transparent;
+            font-weight: 600;
+            user-select: none;
+            transition: none;
+            text-transform: uppercase;
+            letter-spacing: 0.2px;
+        }
+        
+        #main-title {
+            color: #333333;
+            font-weight: 700;
+        }
+        
+        #performance-title {
+            color: #444444;
+        }
+        
+        #evaluation-title {
+            color: #444444;
+        }
+        
+        #main-title:after, #performance-title:after, #evaluation-title:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 50%;
+            background-color: currentColor;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        
+        #main-title:hover:after, #performance-title:hover:after, #evaluation-title:hover:after {
+            width: 80%;
+        }
+        
+        /* Tüm settings-card içindeki paragrafların margin'ini azalttım */
+        .settings-card p {
+            margin-bottom: 6px;
+        }
+        
+        /* Tab'lar için daha kompakt stil */
+        .nav-tabs .nav-link {
+            padding: 6px 12px;
+            font-size: 0.9rem;
+            border: 1px solid #dee2e6;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            color: #495057;
+            background-color: #f0f4f8;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: #6f42c1;
+            font-weight: bold;
+            background-color: #f0f4f8;
+            box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Tab ile içerik arasındaki boşluğu azalt */
+        #mainTabs {
+            margin-bottom: 10px;
+        }
+        
+        /* Button group margin azalt */
+        .button-group {
+            margin-bottom: 10px;
+            gap: 3px;
+        }
+        
+        /* Düğmeler için daha kompakt boyut */
+        .btn {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+        }
+        
+        @media print {
+            /* Temel sayfa ayarları */
+            @page {
+                size: landscape;
+                margin: 0.5cm;
+            }
+            
+            /* Temel görünürlük kuralları */
+            body {
+                background: white !important;
+                color: black;
+                margin: 0 !important;
+                padding: 0 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                width: 100% !important;
+            }
+            
+            .container {
+                max-width: none !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                background: white !important;
+            }
+            
+            /* Yazdırma çıktısından uygulama başlığını kaldır */
+            .app-title-container {
+                display: none !important;
+            }
+            
+            /* Modalları yazdırma sırasında asla gizleme */
+            .modal, .modal-dialog, .modal-content, .modal-body, #criteria-list, 
+            #criteria-list .mb-3, #criteria-list .form-label, #criteria-list .input-group, 
+            #criteria-list .form-control {
+                display: block !important;
+            }
+            
+            /* Gizlenecek öğeler */
+            .settings-card, .button-group, .nav-tabs, .header-card,
+            #add-student-btn, #print-btn, #clear-table-btn, 
+            #edit-criteria-btn, #import-pdf-btn, 
+            .row.mb-3, .form-control:not(#criteria-list .form-control),
+            #main-title, #class-tags, 
+            .form-select:not(#criteria-list .form-select), 
+            .btn:not(#criteria-list .btn) {
+                display: none !important;
+            }
+            
+            /* Form kontrollerini modallarda göster */
+            #addStudentModal .form-control, 
+            #editStudentModal .form-control, 
+            #addClassModal .form-control {
+                display: block !important;
+            }
+            
+            /* Görünecek ana öğeler */
+            .container, .table-container, .print-container, 
+            .table-responsive, .table, #print-main-title, 
+            #print-evaluation-title, #print-performance-title {
+                display: block !important;
+                visibility: visible !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                background-color: white !important;
+            }
+            
+            /* Başlık öğeleri */
+            #print-main-title {
+                font-size: 12pt;
+                font-weight: 700 !important;
+                text-transform: uppercase;
+                letter-spacing: 0.2px;
+                color: #333333;
+                text-align: center !important;
+                margin-top: 5px;
+                margin-bottom: 5px !important;
+                width: 100% !important;
+                line-height: 1.2;
+                padding: 0;
+                background-color: white !important;
+            }
+            
+            #print-evaluation-title {
+                font-size: 11pt;
+                font-weight: 600 !important;
+                text-transform: uppercase;
+                letter-spacing: 0.2px;
+                color: #444444;
+                text-align: center !important;
+                margin-bottom: 2px !important;
+                width: 100% !important;
+                line-height: 1.2;
+                padding: 0;
+                background-color: white !important;
+            }
+            
+            #print-performance-title {
+                font-size: 11pt;
+                font-weight: 600 !important;
+                text-transform: uppercase;
+                letter-spacing: 0.2px;
+                color: #444444;
+                text-align: center !important;
+                margin-bottom: 5px !important;
+                width: 100% !important;
+                line-height: 1.2;
+                padding: 0;
+                background-color: white !important;
+            }
+            
+            /* Tablo ve başlıkları aynı sayfada tutma */
+            .print-container {
+                page-break-inside: avoid !important;
+                page-break-before: avoid !important;
+                page-break-after: avoid !important;
+                width: 100% !important;
+                margin: 0 auto !important;
+                padding: 0 !important;
+                background-color: white !important;
+            }
+            
+            /* Table container taşmalarını önle */
+            .table-responsive {
+                overflow: visible !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                display: flex !important;
+                justify-content: center !important;
+                background-color: white !important;
+            }
+            
+            /* Tablo tam sayfa genişliğinde */
+            .table-container {
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                max-width: 100% !important;
+                display: flex !important;
+                justify-content: center !important;
+                background-color: white !important;
+            }
+            
+            /* Tablo başlık ve içeriği */
+            .table {
+                width: 98% !important;
+                max-width: 98% !important;
+                font-size: 10pt;
+                border-collapse: collapse;
+                table-layout: fixed !important;
+                page-break-inside: avoid;
+                margin: 0 auto !important;
+                padding: 0 !important;
+                background-color: white !important;
+            }
+            
+            .table thead {
+                display: table-header-group !important;
+                background-color: white !important;
+            }
+            
+            .table tbody {
+                display: table-row-group !important;
+                background-color: white !important;
+            }
+            
+            .table tr {
+                display: table-row !important;
+                page-break-inside: avoid;
+                height: auto !important;
+                min-height: 22px;
+                width: 100% !important;
+                background-color: white !important;
+            }
+            
+            .table th, .table td {
+                border: 1px solid black !important;
+                padding: 3px 2px !important;
+                text-align: center;
+                vertical-align: middle;
+                height: auto !important;
+                min-height: 22px;
+                line-height: 1.2;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                background-color: white !important;
+            }
+            
+            .table th {
+                background-color: white !important;
+                font-weight: bold;
+                font-size: 9pt;
+                padding: 2px 1px !important;
+            }
+            
+            /* İkinci satır başlık hücresi */
+            .table thead tr:nth-child(2) th {
+                padding: 1px !important;
+                height: auto !important;
+                background-color: white !important;
+            }
+            
+            /* Sütun genişlikleri */
+            .table th:first-child, .table td:first-child {
+                width: 7% !important;
+                background-color: white !important;
+            }
+            
+            .table th:nth-child(2), .table td:nth-child(2) {
+                width: 15% !important;
+                background-color: white !important;
+            }
+            
+            .table th:last-child, .table td:last-child {
+                display: none !important;
+            }
+            
+            .table th:nth-last-child(2), .table td:nth-last-child(2) {
+                width: 6% !important;
+                font-weight: bold;
+                background-color: white !important;
+            }
+            
+            .table th:not(:first-child):not(:nth-child(2)):not(:last-child):not(:nth-last-child(2)), 
+            .table td:not(:first-child):not(:nth-child(2)):not(:last-child):not(:nth-last-child(2)) {
+                width: 7.2% !important;
+                background-color: white !important;
+            }
+            
+            /* Input styling */
+            .table input[type="number"] {
+                border: none !important;
+                background: white !important;
+                font-size: 10pt;
+                width: 100% !important;
+                text-align: center;
+                -webkit-appearance: none;
+                -moz-appearance: textfield;
+                appearance: none;
+                padding: 0 !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+                height: auto !important;
+            }
+            
+            .table input.total-input {
+                font-weight: bold;
+                background: white !important;
+                box-shadow: none !important;
+            }
+            
+            /* Chrome için özel düzeltmeler */
+            @media screen and (-webkit-min-device-pixel-ratio:0) {
+                body {
+                    width: 100vw !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    background: white !important;
+                }
+                
+                .container {
+                    width: 100vw !important;
+                    max-width: 100vw !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    background: white !important;
+                }
+                
+                .print-container {
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    margin: 0 auto !important;
+                    padding: 0 !important;
+                    background: white !important;
+                }
+                
+                .table {
+                    width: 98% !important;
+                    margin: 0 auto !important;
+                    padding: 0 !important;
+                    background: white !important;
+                }
+                
+                .table th, .table td {
+                    font-size: 10pt !important;
+                    background-color: white !important;
+                }
+            }
+            
+            /* Sayfa sonları ve sayfa altbilgisi */
+            .print-footer {
+                position: fixed;
+                bottom: 0.3cm;
+                width: 100%;
+                font-size: 8pt;
+                text-align: center;
+                border-top: 1px solid black;
+                padding-top: 2px;
+                display: block !important;
+                margin-top: 3px;
+                background-color: white !important;
+            }
+            
+            /* Öğrenci sayısına göre otomatik yükseklik ayarı */
+            #student-list tr {
+                height: auto !important;
+                background-color: white !important;
+            }
+            
+            /* Chrome ve Edge'de okuma modundaki gereksiz başlıkları gizle */
+            body::before {
+                content: none !important;
+                display: none !important;
+            }
+            
+            fieldset, form, input:not([type="number"]) {
+                display: none !important;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .total-input {
+                width: 40px !important;
+            }
+        }
+        
+        /* Neumorphic form elemanları */
+        .form-control, .form-select {
+            background-color: #f2f7ff;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 15px;
+            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.1), inset -2px -2px 5px rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            outline: none;
+            box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.1), inset -4px -4px 8px rgba(255, 255, 255, 0.5);
+            background-color: #ffffff;
+        }
+        
+        .input-group-text {
+            background-color: #d0e0f5;
+            border: none;
+            border-radius: 10px 0 0 10px;
+            box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .action-btn, .btn {
+            padding: 8px 15px;
+            border-radius: 10px;
+            margin: 5px;
+            font-weight: bold;
+            font-size: 14px;
+            border: none;
+            box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1), -5px -5px 10px rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            box-shadow: 7px 7px 12px rgba(0, 0, 0, 0.15), -7px -7px 12px rgba(255, 255, 255, 0.7);
+            transform: translateY(-2px);
+        }
+        
+        .btn:active {
+            box-shadow: inset 3px 3px 5px rgba(0, 0, 0, 0.1), inset -3px -3px 5px rgba(255, 255, 255, 0.5);
+            transform: translateY(0);
+        }
+        .upload-section {
+            background-color: #f0f4f8;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 8px 8px 15px rgba(174, 174, 192, 0.4), -8px -8px 15px rgba(255, 255, 255, 0.65);
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .spinner-border {
+            width: 2rem;
+            height: 2rem;
+        }
+        .progress-bar {
+            height: 5px;
+            transition: width 0.3s ease;
+            border-radius: 5px;
+        }
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 15px;
+        }
+        #mainTabs {
+            margin-bottom: 20px;
+        }
+        /* Modallar için Neumorphic stil */
+        .modal-content {
+            background: linear-gradient(135deg, #f5f9ff 0%, #e8f4ff 100%);
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1), 0 5px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        
+        .modal-header {
+            border-bottom: 1px solid rgba(180, 200, 240, 0.3);
+            background: linear-gradient(135deg, #6a3de8 0%, #5229b8 100%);
+            color: white;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            padding: 15px 20px;
+        }
+        
+        .modal-header .modal-title {
+            font-weight: 600;
+            text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header .btn-close {
+            color: white;
+            text-shadow: none;
+            opacity: 0.8;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            padding: 6px;
+            margin: -6px -6px -6px auto;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header .btn-close:hover {
+            opacity: 1;
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+        
+        .modal-footer {
+            border-top: 1px solid rgba(180, 200, 240, 0.3);
+            background: linear-gradient(135deg, #f0f5ff 0%, #e5eeff 100%);
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            padding: 12px 20px;
+        }
+        
+        .modal-body {
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+            background-color: #ffffff;
+        }
+        
+        /* Kriter list için özel stil */
+        #criteria-list {
+            display: block !important;
+        }
+        
+        #criteria-list .mb-3 {
+            margin-bottom: 1rem !important;
+            display: block !important;
+        }
+        
+        #criteria-list .form-label {
+            display: block !important;
+            margin-bottom: 0.5rem !important;
+        }
+        
+        #criteria-list .input-group {
+            display: flex !important;
+        }
+        
+        #criteria-list .form-control {
+            display: block !important;
+        }
+        
+        .btn-close {
+            background-color: #f0f4f8;
+            border-radius: 50%;
+            box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.1), -3px -3px 5px rgba(255, 255, 255, 0.5);
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-close:hover {
+            opacity: 1;
+            box-shadow: 4px 4px 6px rgba(0, 0, 0, 0.15), -4px -4px 6px rgba(255, 255, 255, 0.7);
+        }
+        .table input[type="number"]::-webkit-outer-spin-button,
+        .table input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        /* Tüm gereksiz üst başlık ve formları gizle */
+        .row.mb-3, #student-no, #student-name {
+            display: none !important;
+        }
+        
+        /* Bu kısıtlamayı kriter modal öğelerinden çıkaralım */
+        #criteriaModal .row.mb-3,
+        #criteriaModal .input-group, 
+        #criteriaModal .form-label, 
+        #criteriaModal input[type="text"],
+        #criteriaModal .form-control {
+            display: block !important;
+        }
+        
+        #criteriaModal .input-group {
+            display: flex !important;
+        }
+        
+        /* Chrome ve Edge'de okuma modundaki gereksiz başlıkları gizle */
+        @media print {
+            body::before {
+                content: none !important;
+                display: none !important;
+            }
+            fieldset, form, input:not([type="number"]) {
+                display: none !important;
+            }
+        }
+        
+        /* Print modunda başlıkların daha küçük görünmesi için yazdırma öncesi font boyutlarını ayarlama */
+        #print-main-title {
+            font-size: 12pt;
+            margin-top: 5px;
+            margin-bottom: 3px;
+            line-height: 1.2;
+            text-transform: uppercase;
+            letter-spacing: 0.2px;
+            font-weight: 700;
+            color: #333333;
+        }
+        
+        #print-evaluation-title {
+            font-size: 11pt;
+            margin-bottom: 2px;
+            line-height: 1.2;
+            text-transform: uppercase;
+            letter-spacing: 0.2px;
+            font-weight: 600;
+            color: #444444;
+        }
+        
+        #print-performance-title {
+            font-size: 11pt;
+            margin-bottom: 5px;
+            line-height: 1.2;
+            text-transform: uppercase;
+            letter-spacing: 0.2px;
+            font-weight: 600;
+            color: #444444;
+        }
+        
+        /* Tablo başlıklarının daha kompakt görünmesi */
+        .print-container {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+        }
+        
+        /* Başlık üstündeki boşluk azaltma */
+        .header-title span {
+            line-height: 1.2;
+        }
+        
+        /* Başlık altındaki paragrafların satır yüksekliğini azalt */
+        .settings-card p span {
+            line-height: 1.2;
+        }
+
+        /* CSS kısmında bu stil kurallarını ekleyelim */
+        
+        /* Başlık için contenteditable outline'ı kaldır */
+        [contenteditable="true"]:focus {
+            outline: none !important;
+            box-shadow: 0 0 0 2px rgba(106, 61, 232, 0.2) !important;
+            border: none !important;
+        }
+
+        /* Span sınıflarındaki border'ları kaldır */
+        .border-bottom, .border-primary, .border-success, .border-info {
+            border: none !important;
+            border-bottom: none !important;
+        }
+
+        /* Contenteditable öğelerin seçim efektlerini kaldır */
+        [contenteditable="true"] {
+            outline: none !important;
+            border: none !important;
+            user-select: text;
+            padding: 8px 15px !important;
+            border-radius: 10px !important;
+            background-color: #f2f7ff !important;
+            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.1), inset -2px -2px 5px rgba(255, 255, 255, 0.5) !important;
+            transition: all 0.3s ease !important;
+            display: inline-block !important;
+            margin-left: 5px !important;
+            text-decoration: none !important;
+            cursor: text !important;
+        }
+
+        [contenteditable="true"]:hover {
+            text-decoration: none !important;
+            border: none !important;
+            outline: none !important;
+        }
+        
+        .editable-title-container {
+            display: flex !important;
+            align-items: center !important;
+        }
+        
+        .edit-icon {
+            color: #6a3de8;
+            margin-right: 5px;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+        
+        .editable-title-container:hover .edit-icon {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        /* Modal stilleri */
+        .modal {
+            display: none;
+            z-index: 1050;
+        }
+        
+        .modal.show {
+            display: block;
+        }
+        
+        .modal-dialog {
+            z-index: 1060;
+            max-width: 500px;
+            margin: 1.75rem auto;
+        }
+        
+        .modal-content {
+            z-index: 1070;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            background: linear-gradient(135deg, #f5f9ff 0%, #e8f4ff 100%);
+            border-radius: 12px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1), 0 5px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        
+        .modal-backdrop {
+            z-index: 1040;
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-color: #000;
+        }
+        
+        .modal-backdrop.show {
+            opacity: 0.6;
+        }
+        
+        .modal-header {
+            border-bottom: 1px solid rgba(180, 200, 240, 0.3);
+            background: linear-gradient(135deg, #6a3de8 0%, #5229b8 100%);
+            color: white;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            padding: 15px 20px;
+        }
+        
+        .modal-header .modal-title {
+            font-weight: 600;
+            text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header .btn-close {
+            color: white;
+            text-shadow: none;
+            opacity: 0.8;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            padding: 6px;
+            margin: -6px -6px -6px auto;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header .btn-close:hover {
+            opacity: 1;
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+        
+        .modal-footer {
+            border-top: 1px solid rgba(180, 200, 240, 0.3);
+            background: linear-gradient(135deg, #f0f5ff 0%, #e5eeff 100%);
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            padding: 12px 20px;
+        }
+        
+        .modal-body {
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+            background-color: #ffffff;
+        }
+        
+        /* Öğrenci ekleme ve düzenleme modalları için özel stiller */
+        #addStudentModal .modal-body input,
+        #editStudentModal .modal-body input,
+        #addStudentModal .modal-body label,
+        #editStudentModal .modal-body label,
+        #addStudentModal .modal-body .form-text,
+        #editStudentModal .modal-body .form-text {
+            display: block !important;
+        }
+        
+        #addStudentModal .modal-body .form-control,
+        #editStudentModal .modal-body .form-control {
+            display: block !important;
+            width: 100% !important;
+        }
+        
+        /* Modal stillerini düzeltme */
+        .modal-content {
+            z-index: 1070;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            background-color: #fff;
+            border-radius: 0.3rem;
+        }
+        
+        /* Uygulama başlık kısmı */
+        .app-title-container {
+            background: linear-gradient(135deg, #6a3de8 0%, #5229b8 100%);
+            color: white;
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(106, 61, 232, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .app-title-container:hover {
+            box-shadow: 0 6px 15px rgba(106, 61, 232, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .app-title {
+            margin: 0;
+            font-weight: 700;
+            font-size: 24px;
+            letter-spacing: 0.5px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Butonları ortala */
+        .col-md-4.d-flex.align-items-end.justify-content-center {
+            display: flex;
+            justify-content: center !important;
+            align-items: center !important;
+        }
+        
+        /* Sınıf listesi açılır menüsünün yüksekliğini butonlarla eşitle */
+        #class-select {
+            height: 38px;
+            padding-top: 0;
+            padding-bottom: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Sınıf ekleme modalındaki form elemanlarını göster */
+        #addClassModal .modal-body label,
+        #addClassModal .modal-body .form-label,
+        #addClassModal .modal-body input[type="text"],
+        #addClassModal .modal-body .form-control {
+            display: block !important;
+        }
+        
+        /* Kompakt arayüz için ek stiller */
+        .settings-card {
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .header-card {
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .button-group {
+            margin-bottom: 10px;
+        }
+        .button-group .btn {
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        
+        /* Compakt sınıf seçim alanı */
+        .class-selection-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .class-selection-row label {
+            margin-right: 10px;
+            margin-bottom: 0;
+        }
+        .class-selection-row select {
+            min-width: 150px;
+            margin-right: 10px;
+        }
+        .class-selection-row .btn-group {
+            display: flex;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="app-title-container">
+            <h3 class="app-title">Performans Değerlendirme Uygulaması</h3>
+        </div>
+        <div class="header-card">
+            <h5 class="header-title editable-title-container">
+                <i class="bi bi-pencil-fill edit-icon"></i>
+                <span id="main-title" contenteditable="true">KARAMAN MESLEKİ VE TEKNİK ANADOLU LİSESİ TÜRK DİLİ VE EDEBİYATI PERFORMANS DEĞERLENDİRME ÖLÇEĞİ</span>
+                <button class="btn btn-sm btn-outline-primary ms-2" id="update-title-btn" style="display: none;">Başlığı Güncelle</button>
+            </h5>
+        </div>
+
+        <div class="settings-card">
+            <p class="mb-2 fw-bold editable-title-container">
+                <i class="bi bi-pencil-fill edit-icon"></i>
+                <span id="performance-title" contenteditable="true">Performans Değerlendirme Kriterleri</span>
+                <button class="btn btn-sm btn-outline-success ms-2" id="update-performance-title-btn" style="display: none;">Güncelle</button>
+            </p>
+        </div>
+
+        <div class="settings-card">
+            <p class="mb-2 fw-bold editable-title-container">
+                <i class="bi bi-pencil-fill edit-icon"></i>
+                <span id="evaluation-title" contenteditable="true">Ders İçi Performans Değerlendirme</span>
+                <button class="btn btn-sm btn-outline-info ms-2" id="update-evaluation-title-btn" style="display: none;">Güncelle</button>
+            </p>
+        </div>
+
+        <ul class="nav nav-tabs" id="mainTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="performance-tab" data-bs-toggle="tab" data-bs-target="#performance" type="button" role="tab" aria-selected="true">Performans Değerlendirme</button>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="performance" role="tabpanel" aria-labelledby="performance-tab">
+                <div class="settings-card">
+                    <div class="class-selection-row">
+                        <label for="class-select" class="form-label mb-0">Sınıf Seçin</label>
+                        <select id="class-select" class="form-select">
+                            <option value="">Seçiniz</option>
+                        </select>
+                        <div class="btn-group">
+                            <button id="add-class-btn" class="btn btn-purple">Sınıf Ekle</button>
+                            <button id="reset-data-btn" class="btn btn-teal">Verileri Sıfırla</button>
+                        </div>
+                    </div>
+                    
+                    <div id="class-tags" class="mt-2">
+                        <!-- Varsayılan sınıf etiketi kaldırıldı -->
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text">Öğrenci No</span>
+                            <input type="text" id="student-no" class="form-control" title="Öğrenci numarasını girin" aria-label="Öğrenci numarası">
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="input-group">
+                            <span class="input-group-text">Öğrenci Adı Soyadı</span>
+                            <input type="text" id="student-name" class="form-control" title="Öğrenci adı ve soyadını girin" aria-label="Öğrenci adı soyadı">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group mb-3">
+                    <button id="add-student-btn" class="btn btn-purple">Öğrenci Ekle</button>
+                    <button id="print-btn" class="btn btn-success">Yazdır</button>
+                    <button id="clear-table-btn" class="btn btn-warning">Tabloyu Temizle</button>
+                    <button id="edit-criteria-btn" class="btn btn-info">Kriterleri Düzenle</button>
+                    <button id="import-pdf-btn" class="btn btn-primary">PDF'den Sınıf Ekle</button>
+                </div>
+
+                <div class="table-container">
+                    <div class="print-container">
+                        <div class="text-center p-3 fw-bold text-uppercase" id="print-main-title">
+                            KARAMAN MESLEKİ VE TEKNİK ANADOLU LİSESİ TÜRK DİLİ VE EDEBİYATI PERFORMANS DEĞERLENDİRME ÖLÇEĞİ
+                        </div>
+                        <div class="text-center mt-1" id="print-evaluation-title">Ders İçi Performans Değerlendirme - 9/E</div>
+                        <div class="text-center pb-2" id="print-performance-title">Performans Değerlendirme Kriterleri</div>
+                    
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th rowspan="2" class="align-middle">Öğrenci<br>No</th>
+                                        <th rowspan="2" class="align-middle">Öğrenci Adı Soyadı</th>
+                                        <th class="align-middle">1. Derse<br>Hazırlıklı<br>Gelme</th>
+                                        <th class="align-middle">2. Derse<br>Katılım</th>
+                                        <th class="align-middle">3. Ödevleri<br>Zamanında<br>Yapma</th>
+                                        <th class="align-middle">4. Ders<br>Araç-<br>Gereçleri</th>
+                                        <th class="align-middle">5. Not<br>Tutma</th>
+                                        <th class="align-middle">6. Etkili<br>Dinleme</th>
+                                        <th class="align-middle">7. Soru<br>Cevaplama</th>
+                                        <th class="align-middle">8. Soru<br>Sorma</th>
+                                        <th class="align-middle">9. Konuya<br>Hakimiyet</th>
+                                        <th class="align-middle">10.<br>Etkinliklerin<br>Farkında<br>Olma</th>
+                                        <th rowspan="2" class="align-middle">Toplam</th>
+                                        <th rowspan="2" class="align-middle">İşlem</th>
+                                    </tr>
+                                    <tr>
+                                        <th colspan="10" class="text-center">Puanlar (0-10 arası)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="student-list">
+                                    <tr>
+                                        <td>248</td>
+                                        <td>MEHMET MESUT PEKER</td>
+                                        <td><input type="number" min="0" max="10" value="0" class="score" onchange="updateTotal(this)" title="1. Derse Hazırlıklı Gelme puanı" aria-label="1. Derse Hazırlıklı Gelme"></td>
+                                        <td><input type="number" min="0" max="10" value="0" class="score" onchange="updateTotal(this)" title="2. Derse Katılım puanı" aria-label="2. Derse Katılım"></td>
+                                        <td><input type="number" min="0" max="10" value="0" class="score" onchange="updateTotal(this)" title="3. Ödevleri Zamanında Yapma puanı" aria-label="3. Ödevleri Zamanında Yapma"></td>
+                                        <td><input type="number" min="0" max="10" value="0" class="score" onchange="updateTotal(this)" title="4. Ders Araç-Gereçleri puanı" aria-label="4. Ders Araç-Gereçleri"></td>
+                                        <td><input type="number" min="0" max="10" value="0" class="score" onchange="updateTotal(this)" title="5. Not Tutma puanı" aria-label="5. Not Tutma"></td>
+                                        <td><input type="number" min="0" max="10" value="0" class="score" onchange="updateTotal(this)" title="6. Etkili Dinleme puanı" aria-label="6. Etkili Dinleme"></td>
+                                        <td><input type="number" min="0" max="10" value="0" class="score" onchange="updateTotal(this)" title="7. Soru Cevaplama puanı" aria-label="7. Soru Cevaplama"></td>
+                                        <td><input type="number" min="0" max="10" value="0" class="score" onchange="updateTotal(this)" title="8. Soru Sorma puanı" aria-label="8. Soru Sorma"></td>
+                                        <td><input type="number" min="0" max="10" value="0" class="score" onchange="updateTotal(this)" title="9. Konuya Hakimiyet puanı" aria-label="9. Konuya Hakimiyet"></td>
+                                        <td><input type="number" min="0" max="10" value="0" class="score" onchange="updateTotal(this)" title="10. Etkinliklerin Farkında Olma puanı" aria-label="10. Etkinliklerin Farkında Olma"></td>
+                                        <td class="total">
+                                            <input type="number" min="0" max="100" step="5" value="0" class="total-input" title="Toplam puan" aria-label="Toplam puan" onchange="distributeTotal(this)" onfocus="this.select()" onkeydown="handleTotalNavigation(event, this)">
+                                        </td>
+                                        <td>
+                                            <button class="btn-edit" title="Düzenle"><i class="bi bi-pencil-fill"></i></button>
+                                            <button class="btn-delete" title="Sil"><i class="bi bi-trash-fill"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Öğrenci Ekleme Modalı -->
+    <div class="modal fade" id="addStudentModal" tabindex="-1" aria-labelledby="addStudentModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addStudentModalLabel">Öğrenci Ekle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="modal-student-no" class="form-label">Öğrenci No</label>
+                        <input type="text" class="form-control" id="modal-student-no" placeholder="Öğrenci numarasını girin">
+                    </div>
+                    <div class="mb-3">
+                        <label for="modal-student-name" class="form-label">Öğrenci Adı Soyadı</label>
+                        <input type="text" class="form-control" id="modal-student-name" placeholder="Öğrenci adı ve soyadını girin">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-primary" id="save-student-btn">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF Yükleme Modalı -->
+    <div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="pdfModalLabel">PDF'den Sınıf Ekle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="upload-section mb-3">
+                        <h5 class="text-center mb-3">PDF Dosyası Yükle</h5>
+                        <div class="alert alert-info mb-3" style="background-color: #e8f4fd; border-color: #b8e0fd;">
+                            <h6 class="mb-2 text-center" style="font-size: 0.95rem; color: #0a58ca;">E-Okul'dan PDF İndirme Adımları:</h6>
+                            <ol style="font-size: 0.85rem; padding-left: 1.5rem; margin-bottom: 0;">
+                                <li>https://e-okul.meb.gov.tr adresinden giriş yapın.</li>
+                                <li>Sol Menüden "Öğrenci İşlemleri"ne gidin.</li>
+                                <li>Raporlar kısmından "Sınıf Listesi (Öğrenci No Sıralı)" seçin.</li>
+                                <li>Listeyi görüntüleyin ve PDF olarak indirin.</li>
+                                <li>İndirdiğiniz dosyayı aşağıdan seçin.</li>
+                            </ol>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-10 offset-md-1">
+                                <div class="file-upload-wrapper mb-3 text-center">
+                                    <input type="file" id="pdf-file" class="form-control btn btn-outline-purple" accept=".pdf" aria-label="PDF dosyası yükle" title="PDF dosyası seçin" style="padding: 0.8rem; font-size: 1.1rem; cursor: pointer; border: 2px dashed #6a3de8; background-color: #f6f3ff; border-radius: 8px; transition: all 0.3s;">
+                                    <!-- "PDF veya Excel dosyası seçin" etiketi kaldırıldı -->
+                                </div>
+                                <!-- Geliştirici modu seçeneği kaldırıldı -->
+                                <div class="text-center">
+                                    <button id="process-pdf" class="btn btn-purple px-4 py-2">
+                                        <i class="bi bi-file-earmark-pdf"></i> PDF'yi İşle
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="loading">
+                        <div class="spinner-border text-primary"></div>
+                        <p>PDF İşleniyor...</p>
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div id="results-container" class="mt-3"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kriterleri Düzenleme Modalı -->
+    <div class="modal fade" id="criteriaModal" tabindex="-1" aria-labelledby="criteriaModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="criteriaModalLabel">Performans Kriterlerini Düzenle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="criteria-list">
+                        <!-- Kriterler burada listelenecek -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-primary" id="save-criteria">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Öğrenci Düzenleme Modalı -->
+    <div class="modal fade" id="editStudentModal" tabindex="-1" aria-labelledby="editStudentModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editStudentModalLabel">Öğrenci Düzenle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="edit-student-no" class="form-label">Öğrenci No</label>
+                        <input type="text" class="form-control" id="edit-student-no" placeholder="Öğrenci numarasını girin">
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-student-name" class="form-label">Öğrenci Adı Soyadı</label>
+                        <input type="text" class="form-control" id="edit-student-name" placeholder="Öğrenci adı ve soyadını girin">
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-student-total" class="form-label">Toplam Puan</label>
+                        <div class="input-group">
+                            <input type="number" min="0" max="100" step="5" class="form-control" id="edit-student-total" value="0">
+                            <button class="btn btn-outline-success" type="button" id="distribute-total-btn">Puanları Dağıt</button>
+                        </div>
+                        <small class="form-text text-muted">Not: Puanları dağıt butonuna tıklayarak toplam puanı kriterlere rastgele dağıtabilirsiniz.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-primary" id="save-edited-student">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sınıf Ekle Modalı -->
+    <div class="modal fade" id="addClassModal" tabindex="-1" aria-labelledby="addClassModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addClassModalLabel">Sınıf Ekle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body" style="padding: 20px;">
+                    <div style="margin-bottom: 1rem;">
+                        <label for="modal-class-name" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Sınıf Adı</label>
+                        <input type="text" style="display: block; width: 100%; padding: 0.375rem 0.75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; background-clip: padding-box; border: 1px solid #ced4da; border-radius: 0.25rem;" id="modal-class-name" placeholder="Sınıf adını girin (ör. 9/E)">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-primary" id="save-class-btn">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap ve diğer bağımlılıklar -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+    
+    <!-- PDF.js'i dahil etme -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+    </script>
+    
+    <!-- PDF işleme kodunu içe aktarma -->
+    <script src="pdf-processing.js"></script>
+    
+    <script>
+        // Global değişkenler
+        let debugMode = false;
+        let classesByName = {};
+        let criteria = [
+            "Derse Hazırlıklı Gelme",
+            "Derse Katılım",
+            "Ödevleri Zamanında Yapma",
+            "Ders Araç-Gereçleri",
+            "Not Tutma",
+            "Etkili Dinleme",
+            "Soru Cevaplama",
+            "Soru Sorma",
+            "Konuya Hakimiyet",
+            "Etkinliklerin Farkında Olma"
+        ];
+        
+        // Sınıf verileri için hafıza yapısı
+        let classData = {
+            // Varsayılan sınıf kaldırıldı
+        };
+        
+        // Aktif sınıf
+        let activeClass = "";
+        
+        // Başlık verileri
+        let titleData = {
+            mainTitle: "KARAMAN MESLEKİ VE TEKNİK ANADOLU LİSESİ TÜRK DİLİ VE EDEBİYATI PERFORMANS DEĞERLENDİRME ÖLÇEĞİ",
+            performanceTitle: "Performans Değerlendirme Kriterleri",
+            evaluationTitle: "Ders İçi Performans Değerlendirme"
+        };
+        
+        // Geliştirici modu için log fonksiyonu
+        function debugLog(...args) {
+            if (debugMode) {
+                console.log(...args);
+            }
+        }
+
+        // Başlıkları eşzamanlı güncelleme fonksiyonları
+        document.getElementById('main-title').addEventListener('input', function() {
+            const newTitle = this.textContent.trim();
+            titleData.mainTitle = newTitle;
+            document.getElementById('print-main-title').textContent = newTitle;
+        });
+        
+        document.getElementById('performance-title').addEventListener('input', function() {
+            const newTitle = this.textContent.trim();
+            titleData.performanceTitle = newTitle;
+            document.getElementById('print-performance-title').textContent = newTitle;
+        });
+        
+        document.getElementById('evaluation-title').addEventListener('input', function() {
+            const newTitle = this.textContent.trim();
+            titleData.evaluationTitle = newTitle;
+            document.getElementById('print-evaluation-title').textContent = newTitle;
+        });
+
+        // Harfleri birleştiren yardımcı fonksiyon
+        function mergeLetters(text) {
+            if (!text) return text;
+            // Türkçe harfler için özel düzeltmeler
+            return text
+                .replace(/I\s*\.+\s*/g, 'İ') // I. -> İ
+                .replace(/I\s+/g, 'I ')      // I ile başlayan kelimelerdeki boşluk
+                .replace(/\s*,\s*/g, ', ')   // Virgül sonrası boşluk düzeltme
+                .trim();
+        }
+        
+        // Toplam puan hesaplama
+        function updateTotal(input) {
+            const row = input.closest('tr');
+            const inputs = row.querySelectorAll('.score');
+            let total = 0;
+            
+            inputs.forEach(input => {
+                const value = parseInt(input.value) || 0;
+                total += value;
+            });
+            
+            // Toplam input alanını güncelle
+            const totalInput = row.querySelector('.total-input');
+            if (totalInput) {
+                totalInput.value = total;
+            }
+        }
+        
+        // Toplam puanı kriterlere dağıtma
+        function distributeTotal(totalInput) {
+            const row = totalInput.closest('tr');
+            const scoreInputs = row.querySelectorAll('.score');
+            const total = parseInt(totalInput.value) || 0;
+            
+            // Toplam puanın 5'in katı olmasını sağla
+            const adjustedTotal = Math.round(total / 5) * 5;
+            totalInput.value = adjustedTotal;
+            
+            if (adjustedTotal === 0) {
+                // Tüm puanları sıfırla
+                scoreInputs.forEach(input => {
+                    input.value = 0;
+                });
+                return;
+            }
+            
+            // Puanları rastgele dağıt
+            const remainingPoints = Array(scoreInputs.length).fill(0);
+            let pointsToDistribute = adjustedTotal;
+            
+            while (pointsToDistribute > 0) {
+                // 5 puan ekle
+                const randomIndex = Math.floor(Math.random() * scoreInputs.length);
+                // Eğer bu kriter zaten 10 puan almışsa, başka birine ver
+                if (remainingPoints[randomIndex] < 10) {
+                    const pointsToAdd = Math.min(5, 10 - remainingPoints[randomIndex]);
+                    remainingPoints[randomIndex] += pointsToAdd;
+                    pointsToDistribute -= pointsToAdd;
+                }
+                
+                // Eğer tüm kriterler 10 puana ulaştıysa çık
+                if (remainingPoints.every(p => p >= 10)) {
+                    break;
+                }
+            }
+            
+            // Puanları input alanlarına yaz
+            remainingPoints.forEach((points, index) => {
+                scoreInputs[index].value = points;
+            });
+        }
+        
+        // Toplam alanları arasında ok tuşlarıyla gezinme
+        function handleTotalNavigation(event, input) {
+            // Yukarı ok tuşu
+            if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                const currentRow = input.closest('tr');
+                const prevRow = currentRow.previousElementSibling;
+                if (prevRow) {
+                    const prevInput = prevRow.querySelector('.total-input');
+                    if (prevInput) {
+                        prevInput.focus();
+                        prevInput.select();
+                    }
+                }
+            }
+            // Aşağı ok tuşu
+            else if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                const currentRow = input.closest('tr');
+                const nextRow = currentRow.nextElementSibling;
+                if (nextRow) {
+                    const nextInput = nextRow.querySelector('.total-input');
+                    if (nextInput) {
+                        nextInput.focus();
+                        nextInput.select();
+                    }
+                }
+            }
+        }
+        
+        // Öğrenci ekleme
+        document.getElementById('add-student-btn').addEventListener('click', function() {
+            // Öğrenci ekle modalını aç
+            const addStudentModal = new bootstrap.Modal(document.getElementById('addStudentModal'));
+            addStudentModal.show();
+        });
+        
+        // Modal içinden öğrenci kaydetme
+        document.getElementById('save-student-btn').addEventListener('click', function() {
+            const studentNo = document.getElementById('modal-student-no').value.trim();
+            const studentName = document.getElementById('modal-student-name').value.trim();
+            
+            if (!studentNo || !studentName) {
+                alert('Lütfen öğrenci no ve adını giriniz!');
+                return;
+            }
+            
+            // Aktif sınıf yoksa uyarı ver
+            if (!activeClass) {
+                alert('Lütfen önce bir sınıf seçin veya oluşturun!');
+                return;
+            }
+            
+            const studentList = document.getElementById('student-list');
+            const newRow = document.createElement('tr');
+            
+            let scoreInputs = '';
+            for (let i = 0; i < criteria.length; i++) {
+                const criteriaNum = i + 1;
+                scoreInputs += `<td><input type="number" min="0" max="10" value="0" class="score" onchange="updateTotal(this)" title="${criteriaNum}. ${criteria[i]} puanı" aria-label="${criteriaNum}. ${criteria[i]}"></td>`;
+            }
+            
+            newRow.innerHTML = `
+                <td>${studentNo}</td>
+                <td>${studentName}</td>
+                ${scoreInputs}
+                <td class="total">
+                    <input type="number" min="0" max="100" step="5" value="0" class="total-input" title="Toplam puan" aria-label="Toplam puan" onchange="distributeTotal(this)" onfocus="this.select()" onkeydown="handleTotalNavigation(event, this)">
+                </td>
+                <td>
+                    <button class="btn-edit" title="Düzenle"><i class="bi bi-pencil-fill"></i></button>
+                    <button class="btn-delete" title="Sil"><i class="bi bi-trash-fill"></i></button>
+                </td>
+            `;
+            
+            studentList.appendChild(newRow);
+            
+            // Modalı kapat
+            const addStudentModal = bootstrap.Modal.getInstance(document.getElementById('addStudentModal'));
+            if (addStudentModal) {
+                addStudentModal.hide();
+                
+                // Modal arka planını temizle
+                setTimeout(() => {
+                    const backdrops = document.querySelectorAll('.modal-backdrop');
+                    backdrops.forEach(backdrop => {
+                        backdrop.remove();
+                    });
+                    document.body.classList.remove('modal-open');
+                    document.body.style.overflow = '';
+                    document.body.style.paddingRight = '';
+                }, 200);
+            }
+            
+            // Formu temizle
+            document.getElementById('modal-student-no').value = '';
+            document.getElementById('modal-student-name').value = '';
+            
+            // Silme düğmesine olay dinleyici ekle
+            const deleteBtn = newRow.querySelector('.btn-delete');
+            deleteBtn.addEventListener('click', function() {
+                if (confirm('Bu öğrenciyi silmek istediğinizden emin misiniz?')) {
+                    newRow.remove();
+                    // Silinen öğrenciden sonra aktif sınıf verilerini güncelle
+                    saveCurrentClassData();
+                }
+            });
+            
+            // Düzenleme düğmesine olay dinleyici ekle
+            const editBtn = newRow.querySelector('.btn-edit');
+            editBtn.addEventListener('click', function() {
+                editStudent(newRow);
+            });
+            
+            // Öğrenci ekledikten sonra sınıf verilerini güncelle
+            saveCurrentClassData();
+        });
+        
+        // Tabloyu temizleme
+        document.getElementById('clear-table-btn').addEventListener('click', function() {
+            if (confirm('Tüm tabloyu temizlemek istediğinizden emin misiniz?')) {
+                const studentList = document.getElementById('student-list');
+                studentList.innerHTML = '';
+            }
+        });
+        
+        // Sınıf ekleme
+        document.getElementById('add-class-btn').addEventListener('click', function() {
+            // Modal'ı göster
+            const addClassModal = new bootstrap.Modal(document.getElementById('addClassModal'));
+            addClassModal.show();
+        });
+        
+        // Sınıf kaydetme butonu
+        document.getElementById('save-class-btn').addEventListener('click', function() {
+            const className = document.getElementById('modal-class-name').value.trim();
+            
+            if (!className) {
+                alert('Lütfen sınıf adı giriniz!');
+                return;
+            }
+            
+            // Sınıf formatını düzenle (ör. "9. Sınıf / E Şubesi (ELEKTRİK-ELEKTRONİK TEKNOLOJİSİ ALANI)" -> "9/E")
+            let formattedClassName = className;
+            
+            // Uzun format kontrolü ve dönüşümü
+            const longFormatMatch = className.match(/(\d+)[.\s]*Sınıf\s*\/?\s*([A-Z])\s*Şubesi/i);
+            if (longFormatMatch) {
+                formattedClassName = `${longFormatMatch[1]}/${longFormatMatch[2]}`;
+            }
+            
+            // Eğer sınıf zaten varsa uyarı ver
+            if (classData[formattedClassName]) {
+                alert('Bu sınıf zaten mevcut!');
+                return;
+            }
+            
+            // Yeni sınıfı veritabanına ekle
+            classData[formattedClassName] = [];
+            
+            const classTagsContainer = document.getElementById('class-tags');
+            const classTag = document.createElement('div');
+            classTag.className = 'class-tag';
+            classTag.innerHTML = `
+                ${formattedClassName}
+                <div class="tag-actions">
+                    <button title="Düzenle"><i class="bi bi-pencil-square"></i></button>
+                    <button title="Sil"><i class="bi bi-x"></i></button>
+                </div>
+            `;
+            
+            classTagsContainer.appendChild(classTag);
+            
+            // Sınıf seçim listesine ekle
+            const classSelect = document.getElementById('class-select');
+            const option = document.createElement('option');
+            option.value = formattedClassName;
+            option.textContent = formattedClassName;
+            classSelect.appendChild(option);
+            
+            // Modal'ı kapat ve formu temizle
+            bootstrap.Modal.getInstance(document.getElementById('addClassModal')).hide();
+            document.getElementById('modal-class-name').value = '';
+            
+            // Sınıf seçme özelliği ekle
+            classTag.addEventListener('click', function(e) {
+                // Tıklanan eleman eğer butonlar değilse sınıfı aktif et
+                if (!e.target.closest('.tag-actions')) {
+                    switchClass(formattedClassName);
+                }
+            });
+            
+            // Silme düğmesine olay dinleyici ekle
+            const deleteBtn = classTag.querySelector('.tag-actions button:last-child');
+            deleteBtn.addEventListener('click', function(e) {
+                e.stopPropagation(); // Sınıf tıklama olayının tetiklenmesini engelle
+                if (confirm(`${formattedClassName} sınıfını silmek istediğinizden emin misiniz?`)) {
+                    classTag.remove();
+                    
+                    // Veri yapısından sınıfı kaldır
+                    delete classData[formattedClassName];
+                    
+                    // Seçim listesinden kaldır
+                    for (let i = 0; i < classSelect.options.length; i++) {
+                        if (classSelect.options[i].value === formattedClassName) {
+                            classSelect.remove(i);
+                            break;
+                        }
+                    }
+                    
+                    // Eğer aktif sınıf silinmişse başka bir sınıfa geç
+                    if (activeClass === formattedClassName) {
+                        if (Object.keys(classData).length > 0) {
+                            switchClass(Object.keys(classData)[0]); 
+                        } else {
+                            // Hiç sınıf kalmadıysa tabloyu temizle
+                            document.getElementById('student-list').innerHTML = '';
+                            activeClass = "";
+                        }
+                    }
+                }
+            });
+        });
+        
+        // Mevcut sınıf etiketlerine sınıf seçme işlevi ekle
+        document.querySelectorAll('.class-tag').forEach(tag => {
+            const className = tag.textContent.trim().split('\n')[0].trim();
+            
+            // Uzun format kontrolü ve dönüşümü
+            let formattedClassName = className;
+            const longFormatMatch = className.match(/(\d+)[.\s]*Sınıf\s*\/?\s*([A-Z])\s*Şubesi/i);
+            if (longFormatMatch) {
+                formattedClassName = `${longFormatMatch[1]}/${longFormatMatch[2]}`;
+                // Etiketi güncelle
+                const tagText = tag.innerHTML.replace(className, formattedClassName);
+                tag.innerHTML = tagText;
+            }
+            
+            // Varsayılan olarak 9/E için veri yapısı eklenmişti, diğer mevcut sınıflar için de ekle
+            if (!classData[formattedClassName]) {
+                classData[formattedClassName] = [];
+            }
+            
+            // Sınıfa tıklama olayı ekle
+            tag.addEventListener('click', function(e) {
+                // Tıklanan eleman eğer butonlar değilse sınıfı aktif et
+                if (!e.target.closest('.tag-actions')) {
+                    switchClass(formattedClassName);
+                }
+            });
+        });
+        
+        // Mevcut silme düğmelerine olay dinleyicileri ekle
+        document.querySelectorAll('.tag-actions button:last-child').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation(); // Sınıf tıklama olayının tetiklenmesini engelle
+                const classTag = this.closest('.class-tag');
+                const className = classTag.textContent.trim().split('\n')[0].trim();
+                
+                if (confirm(`${className} sınıfını silmek istediğinizden emin misiniz?`)) {
+                    classTag.remove();
+                    
+                    // Veri yapısından sınıfı kaldır
+                    delete classData[className];
+                    
+                    // Seçim listesinden kaldır
+                    const classSelect = document.getElementById('class-select');
+                    for (let i = 0; i < classSelect.options.length; i++) {
+                        if (classSelect.options[i].value === className) {
+                            classSelect.remove(i);
+                            break;
+                        }
+                    }
+                    
+                    // Eğer aktif sınıf silinmişse başka bir sınıfa geç
+                    if (activeClass === className) {
+                        if (Object.keys(classData).length > 0) {
+                            switchClass(Object.keys(classData)[0]); 
+                        } else {
+                            // Hiç sınıf kalmadıysa tabloyu temizle
+                            document.getElementById('student-list').innerHTML = '';
+                            activeClass = "";
+                        }
+                    }
+                }
+            });
+        });
+        
+        // Sınıf değiştirme fonksiyonu
+        function switchClass(className) {
+            if (!classData[className]) {
+                alert('Sınıf bulunamadı!');
+                return;
+            }
+            
+            // Mevcut öğrenci verilerini kaydet
+            saveCurrentClassData();
+            
+            // Aktif sınıfı değiştir
+            activeClass = className;
+            
+            // Sınıf seçimini güncelle
+            const classSelect = document.getElementById('class-select');
+            for (let i = 0; i < classSelect.options.length; i++) {
+                if (classSelect.options[i].value === className) {
+                    classSelect.selectedIndex = i;
+                    break;
+                }
+            }
+            
+            // Sınıf etiketlerini güncelle
+            document.querySelectorAll('.class-tag').forEach(tag => {
+                const tagClassName = tag.textContent.trim().split('\n')[0].trim();
+                if (tagClassName === className) {
+                    tag.style.backgroundColor = '#4a28a9'; // Aktif sınıfı vurgula
+                } else {
+                    tag.style.backgroundColor = '#6f42c1'; // Diğer sınıfları eski rengine döndür
+                }
+            });
+            
+            // Seçilen sınıfın verilerini yükle
+            loadClassData(className);
+        }
+        
+        // Mevcut sınıfın verilerini kaydet
+        function saveCurrentClassData() {
+            if (!activeClass) return;
+            
+            // Mevcut verileri temizle
+            classData[activeClass] = [];
+            
+            // Tablodaki tüm öğrencileri kaydet
+            const rows = document.querySelectorAll('#student-list tr');
+            rows.forEach(row => {
+                const studentNo = row.querySelector('td:first-child').textContent;
+                const studentName = row.querySelector('td:nth-child(2)').textContent;
+                
+                // Puanları kaydet
+                const scores = [];
+                row.querySelectorAll('.score').forEach(input => {
+                    scores.push(parseInt(input.value) || 0);
+                });
+                
+                // Toplam puanı al
+                const totalInput = row.querySelector('.total-input');
+                const totalScore = totalInput ? parseInt(totalInput.value) || 0 : 0;
+                
+                // Öğrenci bilgilerini sınıf verilerine ekle
+                classData[activeClass].push({
+                    studentNo,
+                    studentName,
+                    scores,
+                    totalScore
+                });
+            });
+            
+            debugLog(`'${activeClass}' sınıfının verileri kaydedildi. Toplam ${classData[activeClass].length} öğrenci.`);
+        }
+        
+        // Sınıf verilerini tabloya yükle
+        function loadClassData(className) {
+            const students = classData[className] || [];
+            const studentList = document.getElementById('student-list');
+            studentList.innerHTML = ''; // Mevcut tabloyu temizle
+            
+            // Sınıfın öğrencilerini tabloya yükle
+            students.forEach(student => {
+                const newRow = document.createElement('tr');
+                
+                let scoreInputs = '';
+                for (let i = 0; i < criteria.length; i++) {
+                    const criteriaNum = i + 1;
+                    const score = student.scores && student.scores[i] !== undefined ? student.scores[i] : 0;
+                    scoreInputs += `<td><input type="number" min="0" max="10" value="${score}" class="score" onchange="updateTotal(this)" title="${criteriaNum}. ${criteria[i]} puanı" aria-label="${criteriaNum}. ${criteria[i]}"></td>`;
+                }
+                
+                newRow.innerHTML = `
+                    <td>${student.studentNo}</td>
+                    <td>${student.studentName}</td>
+                    ${scoreInputs}
+                    <td class="total">
+                        <input type="number" min="0" max="100" step="5" value="${student.totalScore || 0}" class="total-input" title="Toplam puan" aria-label="Toplam puan" onchange="distributeTotal(this)" onfocus="this.select()" onkeydown="handleTotalNavigation(event, this)">
+                    </td>
+                    <td>
+                        <button class="btn-edit" title="Düzenle"><i class="bi bi-pencil-fill"></i></button>
+                        <button class="btn-delete" title="Sil"><i class="bi bi-trash-fill"></i></button>
+                    </td>
+                `;
+                
+                studentList.appendChild(newRow);
+                
+                // Silme düğmesine olay dinleyici ekle
+                const deleteBtn = newRow.querySelector('.btn-delete');
+                deleteBtn.addEventListener('click', function() {
+                    if (confirm('Bu öğrenciyi silmek istediğinizden emin misiniz?')) {
+                        newRow.remove();
+                        // Silinen öğrenciden sonra aktif sınıf verilerini güncelle
+                        saveCurrentClassData();
+                    }
+                });
+                
+                // Düzenleme düğmesine olay dinleyici ekle
+                const editBtn = newRow.querySelector('.btn-edit');
+                editBtn.addEventListener('click', function() {
+                    editStudent(newRow);
+                });
+            });
+            
+            debugLog(`'${className}' sınıfının verileri yüklendi. Toplam ${students.length} öğrenci.`);
+        }
+        
+        // Sınıf değiştirme için seçim kutusunu dinle
+        document.getElementById('class-select').addEventListener('change', function() {
+            const className = this.value;
+            if (className !== activeClass) {
+                switchClass(className);
+            }
+        });
+        
+        // Yazdırma işlemi
+        document.getElementById('print-btn').addEventListener('click', function() {
+            // Yazdırma öncesi tablo başlıklarını ayarla
+            const mainTitleElem = document.getElementById('print-main-title');
+            const performanceTitleElem = document.getElementById('print-performance-title');
+            const evaluationTitleElem = document.getElementById('print-evaluation-title');
+            
+            if (mainTitleElem) mainTitleElem.textContent = document.getElementById('main-title').textContent;
+            if (evaluationTitleElem) {
+                let evaluationText = document.getElementById('evaluation-title').textContent;
+                // Sınıf bilgisini ekle
+                const currentClass = activeClass || "9/E";
+                
+                // Kontrol et - eğer uzun sınıf adı formatıysa kısalt
+                let formattedCurrentClass = currentClass;
+                const longFormatMatch = currentClass.match(/(\d+)[.\s]*Sınıf\s*\/?\s*([A-Z])\s*Şubesi/i);
+                if (longFormatMatch) {
+                    formattedCurrentClass = `${longFormatMatch[1]}/${longFormatMatch[2]}`;
+                }
+                
+                evaluationTitleElem.textContent = evaluationText + " - " + formattedCurrentClass;
+            }
+            if (performanceTitleElem) performanceTitleElem.textContent = document.getElementById('performance-title').textContent;
+            
+            // Eğer zaten bir altbilgi varsa kaldır
+            const existingFooter = document.querySelector('.print-footer');
+            if (existingFooter) {
+                existingFooter.remove();
+            }
+            
+            // Altbilgi ekle
+            const currentDate = new Date();
+            const dateStr = currentDate.toLocaleDateString('tr-TR');
+            const tableContainer = document.querySelector('.table-container');
+            
+            // Sınıf adını format kontrolü
+            let formattedClass = activeClass;
+            const longClassFormatMatch = activeClass.match(/(\d+)[.\s]*Sınıf\s*\/?\s*([A-Z])\s*Şubesi/i);
+            if (longClassFormatMatch) {
+                formattedClass = `${longClassFormatMatch[1]}/${longClassFormatMatch[2]}`;
+            }
+            
+            const footer = document.createElement('div');
+            footer.className = 'print-footer d-none';
+            footer.innerHTML = `
+                <div class="page-footer">
+                    <strong>Sınıf:</strong> ${formattedClass} &nbsp;|&nbsp; <strong>Tarih:</strong> ${dateStr} &nbsp;|&nbsp; <strong>Sayfa:</strong> 1
+                </div>
+            `;
+            tableContainer.appendChild(footer);
+            
+            // Yazdır
+            window.print();
+            
+            // Çıktı sonrası temizlik
+            setTimeout(() => {
+                footer.remove();
+            }, 1000);
+        });
+        
+        // Başlık güncelleme butonları
+        document.getElementById('update-title-btn').addEventListener('click', function() {
+            const mainTitle = document.getElementById('main-title').textContent.trim();
+            titleData.mainTitle = mainTitle;
+            document.getElementById('print-main-title').textContent = mainTitle;
+            document.querySelector('.header-title').textContent = mainTitle;
+        });
+        
+        document.getElementById('update-performance-title-btn').addEventListener('click', function() {
+            const performanceTitle = document.getElementById('performance-title').textContent.trim();
+            titleData.performanceTitle = performanceTitle;
+            document.getElementById('print-performance-title').textContent = performanceTitle;
+        });
+        
+        document.getElementById('update-evaluation-title-btn').addEventListener('click', function() {
+            const evaluationTitle = document.getElementById('evaluation-title').textContent.trim();
+            titleData.evaluationTitle = evaluationTitle;
+            document.getElementById('print-evaluation-title').textContent = evaluationTitle;
+        });
+        
+        // Öğrenci düzenleme fonksiyonu
+        function editStudent(row) {
+            const studentNo = row.querySelector('td:first-child').textContent;
+            const studentName = row.querySelector('td:nth-child(2)').textContent;
+            const totalInput = row.querySelector('.total-input');
+            const totalScore = totalInput ? parseInt(totalInput.value) || 0 : 0;
+            
+            // Modal DOM elemanlarını seç
+            const modal = document.getElementById('editStudentModal');
+            const editStudentNoInput = document.getElementById('edit-student-no');
+            const editStudentNameInput = document.getElementById('edit-student-name');
+            const editStudentTotalInput = document.getElementById('edit-student-total');
+            
+            // Form alanlarını doldur
+            editStudentNoInput.value = studentNo;
+            editStudentNameInput.value = studentName;
+            editStudentTotalInput.value = totalScore;
+            
+            // Önceki olay dinleyicileri temizle
+            const saveBtn = document.getElementById('save-edited-student');
+            const distributeBtn = document.getElementById('distribute-total-btn');
+            
+            // Eski event listener'ları kaldır (clone ile)
+            const saveBtnClone = saveBtn.cloneNode(true);
+            saveBtn.parentNode.replaceChild(saveBtnClone, saveBtn);
+            
+            const distributeBtnClone = distributeBtn.cloneNode(true);
+            distributeBtn.parentNode.replaceChild(distributeBtnClone, distributeBtn);
+            
+            // Kaydetme fonksiyonunu tanımla
+            const handleSave = function() {
+                const newStudentNo = editStudentNoInput.value.trim();
+                const newStudentName = editStudentNameInput.value.trim();
+                const newTotalScore = editStudentTotalInput.value.trim();
+                
+                if (!newStudentNo || !newStudentName) {
+                    alert('Lütfen öğrenci no ve adını giriniz!');
+                    return;
+                }
+                
+                // Öğrenci bilgilerini güncelle
+                row.querySelector('td:first-child').textContent = newStudentNo;
+                row.querySelector('td:nth-child(2)').textContent = newStudentName;
+                
+                // Toplam puanı güncelle ve dağıt
+                if (newTotalScore !== totalInput.value) {
+                    totalInput.value = newTotalScore;
+                    distributeTotal(totalInput);
+                }
+                
+                // Aktif sınıfın verilerini güncelle
+                saveCurrentClassData();
+                
+                // Modalı kapat
+                const modalInstance = bootstrap.Modal.getInstance(modal);
+                if (modalInstance) {
+                    modalInstance.hide();
+                    
+                    // Modal arka planını temizle
+                    setTimeout(() => {
+                        const backdrops = document.querySelectorAll('.modal-backdrop');
+                        backdrops.forEach(backdrop => {
+                            backdrop.remove();
+                        });
+                        document.body.classList.remove('modal-open');
+                        document.body.style.overflow = '';
+                        document.body.style.paddingRight = '';
+                    }, 200);
+                }
+            };
+            
+            // Puanları dağıt fonksiyonunu tanımla
+            const handleDistribute = function() {
+                const totalValue = parseInt(editStudentTotalInput.value) || 0;
+                
+                // Toplam input alanına değeri ata
+                totalInput.value = totalValue;
+                
+                // Puanları dağıt
+                distributeTotal(totalInput);
+            };
+            
+            // Kaydetme butonuna tıklama olayını ekle
+            document.getElementById('save-edited-student').addEventListener('click', handleSave);
+            
+            // Puanları dağıt butonuna tıklama olayını ekle
+            document.getElementById('distribute-total-btn').addEventListener('click', handleDistribute);
+            
+            // Modal kapanma olayını dinle
+            modal.addEventListener('hidden.bs.modal', function handler() {
+                // Event listener'ı bir kez çalıştıktan sonra kaldır
+                modal.removeEventListener('hidden.bs.modal', handler);
+                
+                // Modal arka planını temizle
+                const backdrops = document.querySelectorAll('.modal-backdrop');
+                backdrops.forEach(backdrop => {
+                    backdrop.remove();
+                });
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+            });
+            
+            // Modalı aç
+            const bsModal = new bootstrap.Modal(modal);
+            bsModal.show();
+        }
+        
+        // Kriterleri düzenleme butonu
+        document.getElementById('edit-criteria-btn').addEventListener('click', function() {
+            try {
+                populateCriteriaModal();
+                const criteriaModal = new bootstrap.Modal(document.getElementById('criteriaModal'));
+                criteriaModal.show();
+            } catch (error) {
+                console.error('Kriter modalı açılırken hata oluştu:', error);
+                alert('Kriter modalı açılırken bir hata oluştu: ' + error.message);
+            }
+        });
+        
+        // Kriterleri modal içinde listeleme
+        function populateCriteriaModal() {
+            const criteriaList = document.getElementById('criteria-list');
+            criteriaList.innerHTML = '';
+            
+            console.log('populateCriteriaModal çağrıldı, kriterler:', criteria);
+            
+            criteria.forEach((criterion, index) => {
+                const criteriaItem = document.createElement('div');
+                criteriaItem.className = 'mb-3';
+                criteriaItem.innerHTML = `
+                    <label for="criteria-${index}" class="form-label">${index + 1}. Kriter</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="criteria-${index}" value="${criterion}">
+                        <button class="btn btn-outline-danger remove-criteria" type="button" data-index="${index}" title="Kriteri kaldır">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                `;
+                criteriaList.appendChild(criteriaItem);
+                
+                // Kriter silme butonuna olay dinleyici ekle
+                const removeBtn = criteriaItem.querySelector('.remove-criteria');
+                if (removeBtn) {
+                    removeBtn.addEventListener('click', function() {
+                        criteriaItem.remove();
+                    });
+                }
+            });
+            
+            // Yeni kriter ekleme butonu
+            const addButton = document.createElement('button');
+            addButton.className = 'btn btn-success mt-2';
+            addButton.innerHTML = '<i class="bi bi-plus-circle"></i> Yeni Kriter Ekle';
+            addButton.addEventListener('click', function() {
+                const newIndex = criteriaList.querySelectorAll('.input-group').length;
+                const criteriaItem = document.createElement('div');
+                criteriaItem.className = 'mb-3';
+                criteriaItem.innerHTML = `
+                    <label for="criteria-${newIndex}" class="form-label">${newIndex + 1}. Kriter</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="criteria-${newIndex}" value="Yeni Kriter">
+                        <button class="btn btn-outline-danger remove-criteria" type="button" data-index="${newIndex}" title="Kriteri kaldır">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                `;
+                criteriaList.appendChild(criteriaItem);
+                
+                // Kriter silme butonuna olay dinleyici ekle
+                const removeBtn = criteriaItem.querySelector('.remove-criteria');
+                if (removeBtn) {
+                    removeBtn.addEventListener('click', function() {
+                        criteriaItem.remove();
+                    });
+                }
+            });
+            
+            criteriaList.appendChild(addButton);
+        }
+        
+        // Kriterleri kaydetme butonu
+        document.getElementById('save-criteria').addEventListener('click', function() {
+            // Yeni kriterleri al
+            const newCriteria = [];
+            document.querySelectorAll('#criteria-list .input-group input').forEach(input => {
+                newCriteria.push(input.value.trim() || 'Kriter');
+            });
+            
+            if (newCriteria.length === 0) {
+                alert('En az bir kriter olmalıdır!');
+                return;
+            }
+            
+            // Tablo başlıklarını güncelle
+            criteria = newCriteria;
+            updateTableHeaders();
+            
+            // Modalı kapat
+            const criteriaModal = bootstrap.Modal.getInstance(document.getElementById('criteriaModal'));
+            criteriaModal.hide();
+        });
+        
+        // Tablo başlıklarını güncelleme
+        function updateTableHeaders() {
+            const headerRow = document.querySelector('thead tr:first-child');
+            // İlk iki ve son iki sütunu koruyarak, aradaki kriterleri güncelle
+            const firstCells = headerRow.querySelectorAll('th:nth-child(-n+2)');
+            const lastCells = headerRow.querySelectorAll('th:nth-last-child(-n+2)');
+            
+            // Tablo başlığını temizle ve ilk iki hücreyi ekle
+            headerRow.innerHTML = '';
+            firstCells.forEach(cell => {
+                headerRow.appendChild(cell.cloneNode(true));
+            });
+            
+            // Kriter başlıklarını ekle
+            criteria.forEach((criterion, index) => {
+                const th = document.createElement('th');
+                th.className = 'align-middle';
+                th.innerHTML = `${index + 1}. ${criterion.replace(/\s+/g, '<br>')}`;
+                headerRow.appendChild(th);
+            });
+            
+            // Son iki hücreyi ekle
+            lastCells.forEach(cell => {
+                headerRow.appendChild(cell.cloneNode(true));
+            });
+            
+            // İkinci satırın colspan değerini güncelle
+            const secondRow = document.querySelector('thead tr:nth-child(2)');
+            const puanlarCell = secondRow.querySelector('th');
+            puanlarCell.setAttribute('colspan', criteria.length);
+            
+            // Tüm öğrencilerin input sayısını güncelle
+            const studentRows = document.querySelectorAll('#student-list tr');
+            studentRows.forEach(row => {
+                // İlk iki ve son iki hücreyi koru
+                const firstStudentCells = row.querySelectorAll('td:nth-child(-n+2)');
+                const lastStudentCells = row.querySelectorAll('td:nth-last-child(-n+2)');
+                
+                // Satırı temizle ve ilk iki hücreyi ekle
+                row.innerHTML = '';
+                firstStudentCells.forEach(cell => {
+                    row.appendChild(cell.cloneNode(true));
+                });
+                
+                // Her kriter için yeni input hücresi ekle
+                criteria.forEach((criterion, index) => {
+                    const td = document.createElement('td');
+                    const criteriaNum = index + 1;
+                    td.innerHTML = `<input type="number" min="0" max="10" value="0" class="score" onchange="updateTotal(this)" title="${criteriaNum}. ${criterion} puanı" aria-label="${criteriaNum}. ${criterion}">`;
+                    row.appendChild(td);
+                });
+                
+                // Son iki hücreyi ekle
+                const totalCell = document.createElement('td');
+                totalCell.className = 'total';
+                totalCell.innerHTML = `<input type="number" min="0" max="100" step="5" value="0" class="total-input" title="Toplam puan" aria-label="Toplam puan" onchange="distributeTotal(this)" onfocus="this.select()" onkeydown="handleTotalNavigation(event, this)">`;
+                row.appendChild(totalCell);
+                
+                // İşlem hücresi
+                const actionCell = document.createElement('td');
+                actionCell.innerHTML = `
+                    <button class="btn-edit" title="Düzenle"><i class="bi bi-pencil-fill"></i></button>
+                    <button class="btn-delete" title="Sil"><i class="bi bi-trash-fill"></i></button>
+                `;
+                row.appendChild(actionCell);
+                
+                // Düzenleme ve silme düğmelerine yeniden olay dinleyici ekle
+                const deleteBtn = row.querySelector('.btn-delete');
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', function() {
+                        if (confirm('Bu öğrenciyi silmek istediğinizden emin misiniz?')) {
+                            row.remove();
+                        }
+                    });
+                }
+                
+                const editBtn = row.querySelector('.btn-edit');
+                if (editBtn) {
+                    editBtn.addEventListener('click', function() {
+                        editStudent(row);
+                    });
+                }
+                
+                // Toplam puanı güncelle
+                updateTotal(row.querySelector('.score'));
+            });
+        }
+
+        // PDF'den öğrencileri aktarma butonu
+        document.getElementById('import-pdf-btn').addEventListener('click', function() {
+            // PDF modali aç
+            const pdfModal = new bootstrap.Modal(document.getElementById('pdfModal'));
+            pdfModal.show();
+        });
+
+        // Uygulamayı başlat
+        document.addEventListener('DOMContentLoaded', function() {
+            // Varsayılan sınıfı aktif etme işlemi kaldırıldı
+            // Mevcut öğrenci satırlarındaki düğmelere olay dinleyicileri ekle
+            document.querySelectorAll('#student-list tr').forEach(row => {
+                // Silme düğmesine olay dinleyici ekle
+                const deleteBtn = row.querySelector('.btn-delete');
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', function() {
+                        if (confirm('Bu öğrenciyi silmek istediğinizden emin misiniz?')) {
+                            row.remove();
+                            // Silinen öğrenciden sonra aktif sınıf verilerini güncelle
+                            saveCurrentClassData();
+                        }
+                    });
+                }
+                
+                // Düzenleme düğmesine olay dinleyici ekle
+                const editBtn = row.querySelector('.btn-edit');
+                if (editBtn) {
+                    editBtn.addEventListener('click', function() {
+                        editStudent(row);
+                    });
+                }
+            });
+            
+            // ContentEditable olayları
+            document.getElementById('main-title').addEventListener('input', function() {
+                titleData.mainTitle = this.textContent.trim();
+            });
+            
+            document.getElementById('performance-title').addEventListener('input', function() {
+                titleData.performanceTitle = this.textContent.trim();
+            });
+            
+            document.getElementById('evaluation-title').addEventListener('input', function() {
+                titleData.evaluationTitle = this.textContent.trim();
+            });
+            
+            // Kriterleri düzenleme butonunu yeniden tanımla
+            const editCriteriaBtn = document.getElementById('edit-criteria-btn');
+            if (editCriteriaBtn) {
+                // Önceki olay dinleyicilerini kaldır
+                const newEditCriteriaBtn = editCriteriaBtn.cloneNode(true);
+                editCriteriaBtn.parentNode.replaceChild(newEditCriteriaBtn, editCriteriaBtn);
+                
+                // Yeni olay dinleyicisini ekle
+                newEditCriteriaBtn.addEventListener('click', function() {
+                    try {
+                        console.log('Kriter düzenleme modalı açılıyor...');
+                        console.log('Kriterler:', criteria);
+                        populateCriteriaModal();
+                        const criteriaModal = new bootstrap.Modal(document.getElementById('criteriaModal'));
+                        criteriaModal.show();
+                    } catch (error) {
+                        console.error('Kriter modalı açılırken hata oluştu:', error);
+                        alert('Kriter modalı açılırken bir hata oluştu: ' + error.message);
+                    }
+                });
+            }
+            
+            // Kriter kaydetme butonuna olay dinleyicisini yeniden ekle
+            const saveCriteriaBtn = document.getElementById('save-criteria');
+            if (saveCriteriaBtn) {
+                const newSaveCriteriaBtn = saveCriteriaBtn.cloneNode(true);
+                saveCriteriaBtn.parentNode.replaceChild(newSaveCriteriaBtn, saveCriteriaBtn);
+                
+                newSaveCriteriaBtn.addEventListener('click', function() {
+                    // Yeni kriterleri al
+                    const newCriteria = [];
+                    document.querySelectorAll('#criteria-list .input-group input').forEach(input => {
+                        newCriteria.push(input.value.trim() || 'Kriter');
+                    });
+                    
+                    if (newCriteria.length === 0) {
+                        alert('En az bir kriter olmalıdır!');
+                        return;
+                    }
+                    
+                    console.log('Yeni kriterler kaydediliyor:', newCriteria);
+                    
+                    // Tablo başlıklarını güncelle
+                    criteria = newCriteria;
+                    updateTableHeaders();
+                    
+                    // Modalı kapat
+                    const criteriaModal = bootstrap.Modal.getInstance(document.getElementById('criteriaModal'));
+                    criteriaModal.hide();
+                });
+            }
+        });
+
+        // PDF işleme
+        document.getElementById('process-pdf').addEventListener('click', async function() {
+            const fileInput = document.getElementById('pdf-file');
+            debugMode = false; // Debug modu kontrolü kaldırıldığı için varsayılan olarak false
+            
+            if (!fileInput.files.length) {
+                alert('Lütfen bir PDF dosyası seçin');
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            const loadingElement = document.querySelector('.loading');
+            const progressBar = document.querySelector('.progress-bar');
+            
+            try {
+                loadingElement.style.display = 'block';
+                progressBar.style.width = '10%';
+                
+                const data = await file.arrayBuffer();
+                progressBar.style.width = '30%';
+                
+                const loadingTask = pdfjsLib.getDocument(new Uint8Array(data));
+                loadingTask.onProgress = function(progress) {
+                    if (progress.total) {
+                        const percentage = Math.min(30 + (progress.loaded / progress.total) * 40, 70);
+                        progressBar.style.width = percentage + '%';
+                    }
+                };
+                
+                const pdf = await loadingTask.promise;
+                progressBar.style.width = '70%';
+                
+                debugLog(`PDF yüklendi, ${pdf.numPages} sayfa mevcut`);
+                
+                // Sınıf ve öğrenci bilgilerini çıkarma
+                const classes = await extractClassInfo(pdf);
+                progressBar.style.width = '90%';
+                
+                // Global değişkeni güncelleme
+                classesByName = classes;
+                
+                // PDF'den öğrencileri aktarabilmek için global değişkene kaydedelim
+                window.extractedClasses = classes;
+                
+                // Sonuçları görüntüleme
+                displayClassesAndStudents(classes);
+                
+                progressBar.style.width = '100%';
+                setTimeout(() => {
+                    loadingElement.style.display = 'none';
+                    progressBar.style.width = '0%';
+                }, 500);
+                
+            } catch (error) {
+                console.error('PDF işleme hatası:', error);
+                alert('PDF işlenirken bir hata oluştu: ' + error.message);
+                loadingElement.style.display = 'none';
+            }
+        });
+        
+        // Verileri sıfırlama
+        document.getElementById('reset-data-btn').addEventListener('click', function() {
+            if (confirm('Tüm verileri sıfırlamak istediğinizden emin misiniz? Bu işlem geri alınamaz!')) {
+                // Sınıfları temizle
+                document.getElementById('class-tags').innerHTML = '';
+                document.getElementById('class-select').innerHTML = '<option value="9/E">9/E</option>';
+                
+                // Öğrenci tablosunu temizle
+                document.getElementById('student-list').innerHTML = '';
+                
+                // Varsayılan 9/E sınıfını ekle
+                const classTagsContainer = document.getElementById('class-tags');
+                const classTag = document.createElement('div');
+                classTag.className = 'class-tag';
+                classTag.innerHTML = `
+                    9/E
+                    <div class="tag-actions">
+                        <button title="Düzenle"><i class="bi bi-pencil-square"></i></button>
+                        <button title="Sil"><i class="bi bi-x"></i></button>
+                    </div>
+                `;
+                classTagsContainer.appendChild(classTag);
+                
+                // Silme düğmesine olay dinleyici ekle
+                const deleteBtn = classTag.querySelector('.tag-actions button:last-child');
+                deleteBtn.addEventListener('click', function() {
+                    if (confirm('9/E sınıfını silmek istediğinizden emin misiniz?')) {
+                        classTag.remove();
+                        
+                        // Seçim listesinden kaldır
+                        const classSelect = document.getElementById('class-select');
+                        for (let i = 0; i < classSelect.options.length; i++) {
+                            if (classSelect.options[i].value === '9/E') {
+                                classSelect.remove(i);
+                                break;
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+        // PDF'den öğrencileri performans tablosuna aktarma
+        function importStudentsToPerformanceTable(className) {
+            if (!window.extractedClasses || !window.extractedClasses[className]) {
+                alert('Aktarılacak öğrenci bulunamadı!');
+                return;
+            }
+            
+            const students = window.extractedClasses[className];
+            
+            // PDF modali kapat
+            const pdfModal = bootstrap.Modal.getInstance(document.getElementById('pdfModal'));
+            pdfModal.hide();
+            
+            // Sınıf ekle (eğer yoksa)
+            let classExists = false;
+            const classSelect = document.getElementById('class-select');
+            for (let i = 0; i < classSelect.options.length; i++) {
+                if (classSelect.options[i].value === className) {
+                    classExists = true;
+                    classSelect.selectedIndex = i;
+                    break;
+                }
+            }
+            
+            if (!classExists) {
+                // Veri yapısına sınıfı ekle
+                classData[className] = [];
+                
+                // Sınıf tagını ekle
+                const classTagsContainer = document.getElementById('class-tags');
+                const classTag = document.createElement('div');
+                classTag.className = 'class-tag';
+                classTag.innerHTML = `
+                    ${className}
+                    <div class="tag-actions">
+                        <button title="Düzenle"><i class="bi bi-pencil-square"></i></button>
+                        <button title="Sil"><i class="bi bi-x"></i></button>
+                    </div>
+                `;
+                classTagsContainer.appendChild(classTag);
+                
+                // Sınıf seçim listesine ekle
+                const option = document.createElement('option');
+                option.value = className;
+                option.textContent = className;
+                classSelect.appendChild(option);
+                classSelect.selectedIndex = classSelect.options.length - 1;
+                
+                // Sınıf seçme özelliği ekle
+                classTag.addEventListener('click', function(e) {
+                    // Tıklanan eleman eğer butonlar değilse sınıfı aktif et
+                    if (!e.target.closest('.tag-actions')) {
+                        switchClass(className);
+                    }
+                });
+                
+                // Silme düğmesine olay dinleyici ekle
+                const deleteBtn = classTag.querySelector('.tag-actions button:last-child');
+                deleteBtn.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Sınıf tıklama olayının tetiklenmesini engelle
+                    if (confirm(`${className} sınıfını silmek istediğinizden emin misiniz?`)) {
+                        classTag.remove();
+                        
+                        // Veri yapısından sınıfı kaldır
+                        delete classData[className];
+                        
+                        // Seçim listesinden kaldır
+                        for (let i = 0; i < classSelect.options.length; i++) {
+                            if (classSelect.options[i].value === className) {
+                                classSelect.remove(i);
+                                break;
+                            }
+                        }
+                        
+                        // Eğer aktif sınıf silinmişse başka bir sınıfa geç
+                        if (activeClass === className) {
+                            if (Object.keys(classData).length > 0) {
+                                switchClass(Object.keys(classData)[0]); 
+                            } else {
+                                // Hiç sınıf kalmadıysa tabloyu temizle
+                                document.getElementById('student-list').innerHTML = '';
+                                activeClass = "";
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Önce mevcut sınıf verilerini kaydet
+            saveCurrentClassData();
+            
+            // Aktif sınıfı değiştir
+            activeClass = className;
+            
+            // Sınıf etiketlerini güncelle
+            document.querySelectorAll('.class-tag').forEach(tag => {
+                const tagClassName = tag.textContent.trim().split('\n')[0].trim();
+                if (tagClassName === className) {
+                    tag.style.backgroundColor = '#4a28a9'; // Aktif sınıfı vurgula
+                } else {
+                    tag.style.backgroundColor = '#6f42c1'; // Diğer sınıfları eski rengine döndür
+                }
+            });
+            
+            // Öğrenci tablosunu tamamen temizle
+            const studentList = document.getElementById('student-list');
+            studentList.innerHTML = '';
+            
+            // Sınıf için yeni öğrenci dizisi oluştur
+            classData[className] = [];
+            
+            // Öğrencileri ekle
+            students.forEach(student => {
+                const newRow = document.createElement('tr');
+                
+                let scoreInputs = '';
+                for (let i = 0; i < criteria.length; i++) {
+                    const criteriaNum = i + 1;
+                    scoreInputs += `<td><input type="number" min="0" max="10" value="0" class="score" onchange="updateTotal(this)" title="${criteriaNum}. ${criteria[i]} puanı" aria-label="${criteriaNum}. ${criteria[i]}"></td>`;
+                }
+                
+                newRow.innerHTML = `
+                    <td>${student.student_no}</td>
+                    <td>${student.first_name} ${student.last_name}</td>
+                    ${scoreInputs}
+                    <td class="total">
+                        <input type="number" min="0" max="100" step="5" value="0" class="total-input" title="Toplam puan" aria-label="Toplam puan" onchange="distributeTotal(this)" onfocus="this.select()" onkeydown="handleTotalNavigation(event, this)">
+                    </td>
+                    <td>
+                        <button class="btn-edit" title="Düzenle"><i class="bi bi-pencil-fill"></i></button>
+                        <button class="btn-delete" title="Sil"><i class="bi bi-trash-fill"></i></button>
+                    </td>
+                `;
+                
+                studentList.appendChild(newRow);
+                
+                // Öğrenciyi veri yapısına ekle
+                const scores = Array(criteria.length).fill(0);
+                classData[className].push({
+                    studentNo: student.student_no,
+                    studentName: `${student.first_name} ${student.last_name}`,
+                    scores: scores,
+                    totalScore: 0
+                });
+                
+                // Silme düğmesine olay dinleyici ekle
+                const deleteBtn = newRow.querySelector('.btn-delete');
+                deleteBtn.addEventListener('click', function() {
+                    if (confirm('Bu öğrenciyi silmek istediğinizden emin misiniz?')) {
+                        newRow.remove();
+                        // Silinen öğrenciden sonra aktif sınıf verilerini güncelle
+                        saveCurrentClassData();
+                    }
+                });
+                
+                // Düzenleme düğmesine olay dinleyici ekle
+                const editBtn = newRow.querySelector('.btn-edit');
+                editBtn.addEventListener('click', function() {
+                    editStudent(newRow);
+                });
+            });
+            
+            alert(`${className} sınıfı başarıyla performans tablosuna aktarıldı.`);
+        }
+    </script>
+</body>
+</html> 
