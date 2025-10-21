@@ -1222,7 +1222,7 @@
         <div class="header-card">
             <h5 class="header-title editable-title-container">
                 <i class="bi bi-pencil-fill edit-icon"></i>
-                <span id="main-title" contenteditable="true">KARAMAN MESLEKİ VE TEKNİK ANADOLU LİSESİ TÜRK DİLİ VE EDEBİYATI PERFORMANS DEĞERLENDİRME ÖLÇEĞİ</span>
+                <span id="main-title" contenteditable="true" placeholder="Okul Adını Giriniz">KARAMAN MESLEKİ VE TEKNİK ANADOLU LİSESİ TÜRK DİLİ VE EDEBİYATI PERFORMANS DEĞERLENDİRME ÖLÇEĞİ</span>
                 <button class="btn btn-sm btn-outline-primary ms-2" id="update-title-btn" style="display: none;">Başlığı Güncelle</button>
             </h5>
         </div>
@@ -1230,7 +1230,7 @@
         <div class="settings-card">
             <p class="mb-2 fw-bold editable-title-container">
                 <i class="bi bi-pencil-fill edit-icon"></i>
-                <span id="performance-title" contenteditable="true">Performans Değerlendirme Kriterleri</span>
+                <span id="performance-title" contenteditable="true" placeholder="Performans değerlendirme kriterleri başlığını yazın (ör: Performans Değerlendirme Kriterleri)">Performans Değerlendirme Kriterleri</span>
                 <button class="btn btn-sm btn-outline-success ms-2" id="update-performance-title-btn" style="display: none;">Güncelle</button>
             </p>
         </div>
@@ -1238,7 +1238,7 @@
         <div class="settings-card">
             <p class="mb-2 fw-bold editable-title-container">
                 <i class="bi bi-pencil-fill edit-icon"></i>
-                <span id="evaluation-title" contenteditable="true">Ders İçi Performans Değerlendirme</span>
+                <span id="evaluation-title" contenteditable="true" placeholder="Ders içi değerlendirme başlığını yazın (ör: Ders İçi Performans Değerlendirme)">Ders İçi Performans Değerlendirme</span>
                 <button class="btn btn-sm btn-outline-info ms-2" id="update-evaluation-title-btn" style="display: none;">Güncelle</button>
             </p>
         </div>
@@ -1268,20 +1268,20 @@
                     </div>
                 </div>
 
-                <div class="row mb-3">
-                    <div class="col-md-4">
-                        <div class="input-group">
-                            <span class="input-group-text">Öğrenci No</span>
-                            <input type="text" id="student-no" class="form-control" title="Öğrenci numarasını girin" aria-label="Öğrenci numarası">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <span class="input-group-text">Öğrenci No</span>
+                                <input type="text" id="student-no" class="form-control" placeholder="Öğrenci numarasını yazın (ör: 123)" title="Öğrenci numarasını girin" aria-label="Öğrenci numarası">
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <span class="input-group-text">Öğrenci Adı Soyadı</span>
+                                <input type="text" id="student-name" class="form-control" placeholder="Öğrencinin adını ve soyadını yazın (ör: Ali Veli)" title="Öğrenci adı ve soyadını girin" aria-label="Öğrenci adı soyadı">
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-8">
-                        <div class="input-group">
-                            <span class="input-group-text">Öğrenci Adı Soyadı</span>
-                            <input type="text" id="student-name" class="form-control" title="Öğrenci adı ve soyadını girin" aria-label="Öğrenci adı soyadı">
-                        </div>
-                    </div>
-                </div>
 
                 <div class="button-group mb-3">
                     <button id="add-student-btn" class="btn btn-purple">Öğrenci Ekle</button>
@@ -1385,11 +1385,11 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="modal-student-no" class="form-label">Öğrenci No</label>
-                        <input type="text" class="form-control" id="modal-student-no" placeholder="Öğrenci numarasını girin">
+                        <input type="text" class="form-control" id="modal-student-no" placeholder="Lütfen öğrencinin okul numarasını yazın (ör: 101, 102, 103)">
                     </div>
                     <div class="mb-3">
                         <label for="modal-student-name" class="form-label">Öğrenci Adı Soyadı</label>
-                        <input type="text" class="form-control" id="modal-student-name" placeholder="Öğrenci adı ve soyadını girin">
+                        <input type="text" class="form-control" id="modal-student-name" placeholder="Lütfen öğrencinin tam adını ve soyadını yazın (ör: Ayşe Yılmaz)">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -1486,19 +1486,19 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="edit-student-no" class="form-label">Öğrenci No</label>
-                        <input type="text" class="form-control" id="edit-student-no" placeholder="Öğrenci numarasını girin">
+                        <input type="text" class="form-control" id="edit-student-no" placeholder="Öğrencinin okul numarasını güncelleyin (ör: 101)">
                     </div>
                     <div class="mb-3">
                         <label for="edit-student-name" class="form-label">Öğrenci Adı Soyadı</label>
-                        <input type="text" class="form-control" id="edit-student-name" placeholder="Öğrenci adı ve soyadını girin">
+                        <input type="text" class="form-control" id="edit-student-name" placeholder="Öğrencinin adını ve soyadını güncelleyin (ör: Ayşe Yılmaz)">
                     </div>
                     <div class="mb-3">
                         <label for="edit-student-total" class="form-label">Toplam Puan</label>
                         <div class="input-group">
-                            <input type="number" min="0" max="100" step="5" class="form-control" id="edit-student-total" value="0">
+                            <input type="number" min="0" max="100" step="5" class="form-control" id="edit-student-total" value="0" placeholder="0-100 arası puan girin (5'er katları halinde)">
                             <button class="btn btn-outline-success" type="button" id="distribute-total-btn">Puanları Dağıt</button>
                         </div>
-                        <small class="form-text text-muted">Not: Puanları dağıt butonuna tıklayarak toplam puanı kriterlere rastgele dağıtabilirsiniz.</small>
+                        <small class="form-text text-muted">Not: Puanları dağıt butonuna tıklayarak toplam puanı kriterlere otomatik dağıtabilirsiniz.</small>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -1520,7 +1520,7 @@
                 <div class="modal-body" style="padding: 20px;">
                     <div style="margin-bottom: 1rem;">
                         <label for="modal-class-name" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Sınıf Adı</label>
-                        <input type="text" style="display: block; width: 100%; padding: 0.375rem 0.75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; background-clip: padding-box; border: 1px solid #ced4da; border-radius: 0.25rem;" id="modal-class-name" placeholder="Sınıf adını girin (ör. 9/E)">
+                        <input type="text" style="display: block; width: 100%; padding: 0.375rem 0.75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; background-clip: padding-box; border: 1px solid #ced4da; border-radius: 0.25rem;" id="modal-class-name" placeholder="Sınıf adını yazın (ör: 9/A, 10/B, 11/C)">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -2306,13 +2306,13 @@
                 const criteriaItem = document.createElement('div');
                 criteriaItem.className = 'mb-3';
                 criteriaItem.innerHTML = `
-                    <label for="criteria-${index}" class="form-label">${index + 1}. Kriter</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" id="criteria-${index}" value="${criterion}">
-                        <button class="btn btn-outline-danger remove-criteria" type="button" data-index="${index}" title="Kriteri kaldır">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
+                        <label for="criteria-${index}" class="form-label">${index + 1}. Kriter</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="criteria-${index}" value="${criterion}" placeholder="Değerlendirme kriterini yazın (ör: Proje Teslimi)">
+                            <button class="btn btn-outline-danger remove-criteria" type="button" data-index="${index}" title="Kriteri kaldır">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
                 `;
                 criteriaList.appendChild(criteriaItem);
                 
@@ -2336,7 +2336,7 @@
                 criteriaItem.innerHTML = `
                     <label for="criteria-${newIndex}" class="form-label">${newIndex + 1}. Kriter</label>
                     <div class="input-group">
-                        <input type="text" class="form-control" id="criteria-${newIndex}" value="Yeni Kriter">
+                        <input type="text" class="form-control" id="criteria-${newIndex}" value="Yeni Kriter" placeholder="Yeni değerlendirme kriterini belirtin">
                         <button class="btn btn-outline-danger remove-criteria" type="button" data-index="${newIndex}" title="Kriteri kaldır">
                             <i class="bi bi-trash"></i>
                         </button>
@@ -2833,4 +2833,4 @@
         }
     </script>
 </body>
-</html> 
+</html>
