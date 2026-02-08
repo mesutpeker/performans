@@ -384,7 +384,7 @@
         @media print {
             /* Temel sayfa ayarları */
             @page {
-                size: landscape;
+                size: A4 portrait;
                 margin: 0.5cm;
             }
             
@@ -449,6 +449,7 @@
                 margin: 0 !important;
                 padding: 0 !important;
                 box-shadow: none !important;
+                border-radius: 0 !important;
                 background-color: white !important;
             }
             
@@ -506,6 +507,13 @@
                 padding: 0 !important;
                 background-color: white !important;
             }
+
+            body.print-fit-active .print-container {
+                transform: scale(var(--print-scale, 1));
+                transform-origin: top left;
+                width: calc(100% / var(--print-scale, 1)) !important;
+                max-width: none !important;
+            }
             
             /* Table container taşmalarını önle */
             .table-responsive {
@@ -514,6 +522,7 @@
                 max-width: 100% !important;
                 display: flex !important;
                 justify-content: center !important;
+                border-radius: 0 !important;
                 background-color: white !important;
             }
             
@@ -525,20 +534,39 @@
                 max-width: 100% !important;
                 display: flex !important;
                 justify-content: center !important;
+                overflow: visible !important;
+                border-radius: 0 !important;
                 background-color: white !important;
             }
             
             /* Tablo başlık ve içeriği */
             .table {
-                width: 98% !important;
-                max-width: 98% !important;
+                width: 100% !important;
+                max-width: 100% !important;
                 font-size: 10pt;
                 border-collapse: collapse;
+                border-spacing: 0 !important;
+                border: 1px solid black !important;
                 table-layout: fixed !important;
                 page-break-inside: avoid;
                 margin: 0 auto !important;
                 padding: 0 !important;
+                box-sizing: border-box !important;
+                border-radius: 0 !important;
                 background-color: white !important;
+                position: relative !important;
+            }
+
+            /* Sağ dış kenarı baskıda net ve eş kalınlıkta tut */
+            .table::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 1px;
+                height: 100%;
+                background: black;
+                pointer-events: none;
             }
             
             .table thead {
@@ -573,12 +601,70 @@
                 text-overflow: ellipsis;
                 background-color: white !important;
             }
+
+            /* Dış kenar çizgilerini yazdırmada garanti et */
+            .table thead tr:first-child th,
+            .table tbody tr:first-child td {
+                border-top: 1px solid black !important;
+            }
+
+            .table tbody tr:last-child td {
+                border-bottom: 1px solid black !important;
+            }
+
+            .table thead th:first-child,
+            .table tbody td:first-child {
+                border-left: 1px solid black !important;
+            }
+
+            /* Son görünen sütun: İşlem sütunu gizlendiği için nth-last-child(2) */
+            .table thead th:nth-last-child(2),
+            .table tbody td:nth-last-child(2) {
+                border-right: 1px solid black !important;
+            }
             
             .table th {
                 background-color: white !important;
                 font-weight: bold;
                 font-size: 9pt;
                 padding: 2px 1px !important;
+            }
+
+            .table th .criteria-number {
+                display: block;
+                height: 12px;
+                line-height: 12px;
+                font-weight: 700;
+                margin-bottom: 1px;
+            }
+
+            .table th .criteria-text {
+                display: block;
+                line-height: 1.15;
+                flex: 1 1 auto;
+            }
+
+            .table th .criteria-max-text {
+                display: block;
+                margin-top: auto;
+                line-height: 1;
+                font-size: 8pt;
+                font-weight: 600;
+            }
+
+            .table th.criteria-header-cell {
+                vertical-align: top !important;
+                padding-top: 1px !important;
+                padding-bottom: 1px !important;
+            }
+
+            .table th .criteria-header {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-start;
+                height: 100%;
+                min-height: 44px;
             }
             
             /* İkinci satır başlık hücresi */
@@ -663,7 +749,7 @@
                 }
                 
                 .table {
-                    width: 98% !important;
+                    width: 100% !important;
                     margin: 0 auto !important;
                     padding: 0 !important;
                     background: white !important;
@@ -1305,21 +1391,21 @@
                                     <tr>
                                         <th rowspan="2" class="align-middle">Öğrenci<br>No</th>
                                         <th rowspan="2" class="align-middle">Öğrenci Adı Soyadı</th>
-                                        <th class="align-middle">1. Derse<br>Hazırlıklı<br>Gelme</th>
-                                        <th class="align-middle">2. Derse<br>Katılım</th>
-                                        <th class="align-middle">3. Ödevleri<br>Zamanında<br>Yapma</th>
-                                        <th class="align-middle">4. Ders<br>Araç-<br>Gereçleri</th>
-                                        <th class="align-middle">5. Not<br>Tutma</th>
-                                        <th class="align-middle">6. Etkili<br>Dinleme</th>
-                                        <th class="align-middle">7. Soru<br>Cevaplama</th>
-                                        <th class="align-middle">8. Soru<br>Sorma</th>
-                                        <th class="align-middle">9. Konuya<br>Hakimiyet</th>
-                                        <th class="align-middle">10.<br>Etkinliklerin<br>Farkında<br>Olma</th>
+                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">1.</span><span class="criteria-text">Derse<br>Hazırlıklı<br>Gelme</span><span class="criteria-max-text">(10)</span></span></th>
+                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">2.</span><span class="criteria-text">Derse<br>Katılım</span><span class="criteria-max-text">(10)</span></span></th>
+                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">3.</span><span class="criteria-text">Ödevleri<br>Zamanında<br>Yapma</span><span class="criteria-max-text">(10)</span></span></th>
+                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">4.</span><span class="criteria-text">Ders<br>Araç-<br>Gereçleri</span><span class="criteria-max-text">(10)</span></span></th>
+                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">5.</span><span class="criteria-text">Not<br>Tutma</span><span class="criteria-max-text">(10)</span></span></th>
+                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">6.</span><span class="criteria-text">Etkili<br>Dinleme</span><span class="criteria-max-text">(10)</span></span></th>
+                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">7.</span><span class="criteria-text">Soru<br>Cevaplama</span><span class="criteria-max-text">(10)</span></span></th>
+                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">8.</span><span class="criteria-text">Soru<br>Sorma</span><span class="criteria-max-text">(10)</span></span></th>
+                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">9.</span><span class="criteria-text">Konuya<br>Hakimiyet</span><span class="criteria-max-text">(10)</span></span></th>
+                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">10.</span><span class="criteria-text">Etkinliklerin<br>Farkında<br>Olma</span><span class="criteria-max-text">(10)</span></span></th>
                                         <th rowspan="2" class="align-middle">Toplam</th>
                                         <th rowspan="2" class="align-middle">İşlem</th>
                                     </tr>
                                     <tr>
-                                        <th colspan="10" class="text-center">Puanlar (0-10 arası)</th>
+                                        <th colspan="10" class="text-center">Puanlar (Kriter Bazlı Maksimum)</th>
                                     </tr>
                                 </thead>
                                 <tbody id="student-list">
@@ -1495,7 +1581,7 @@
                     <div class="mb-3">
                         <label for="edit-student-total" class="form-label">Toplam Puan</label>
                         <div class="input-group">
-                            <input type="number" min="0" max="100" step="5" class="form-control" id="edit-student-total" value="0" placeholder="0-100 arası puan girin (5'er katları halinde)">
+                            <input type="number" min="0" max="100" step="5" class="form-control" id="edit-student-total" value="0" placeholder="Toplam puanı girin (5'er katları halinde)">
                             <button class="btn btn-outline-success" type="button" id="distribute-total-btn">Puanları Dağıt</button>
                         </div>
                         <small class="form-text text-muted">Not: Puanları dağıt butonuna tıklayarak toplam puanı kriterlere otomatik dağıtabilirsiniz.</small>
@@ -1561,6 +1647,7 @@
             "Konuya Hakimiyet",
             "Etkinliklerin Farkında Olma"
         ];
+        let criteriaMaxScores = Array(criteria.length).fill(10);
         
         // Sınıf verileri için hafıza yapısı
         let classData = {
@@ -1613,6 +1700,42 @@
                 .replace(/\s*,\s*/g, ', ')   // Virgül sonrası boşluk düzeltme
                 .trim();
         }
+
+        function sanitizeMaxScore(value) {
+            const parsed = parseInt(value, 10);
+            if (Number.isNaN(parsed)) {
+                return 10;
+            }
+            return Math.max(0, parsed);
+        }
+
+        function getCriteriaMaxScore(index) {
+            return sanitizeMaxScore(criteriaMaxScores[index]);
+        }
+
+        function getTotalMaxScore() {
+            return criteriaMaxScores.reduce((sum, score) => sum + sanitizeMaxScore(score), 0);
+        }
+
+        function clampScore(value, maxScore) {
+            const parsed = parseInt(value, 10);
+            if (Number.isNaN(parsed)) {
+                return 0;
+            }
+            return Math.max(0, Math.min(parsed, maxScore));
+        }
+
+        function getScoreInputHtml(index, criterion, value = 0) {
+            const criteriaNum = index + 1;
+            const maxScore = getCriteriaMaxScore(index);
+            const safeValue = clampScore(value, maxScore);
+            return `<td><input type="number" min="0" max="${maxScore}" data-criteria-index="${index}" value="${safeValue}" class="score" onchange="updateTotal(this)" title="${criteriaNum}. ${criterion} puanı" aria-label="${criteriaNum}. ${criterion}"></td>`;
+        }
+
+        function getCriteriaHeaderHtml(index, criterion) {
+            const maxScore = getCriteriaMaxScore(index);
+            return `<span class="criteria-header"><span class="criteria-number">${index + 1}.</span><span class="criteria-text">${criterion.replace(/\s+/g, '<br>')}</span><span class="criteria-max-text">(${maxScore})</span></span>`;
+        }
         
         // Toplam puan hesaplama
         function updateTotal(input) {
@@ -1620,15 +1743,24 @@
             const inputs = row.querySelectorAll('.score');
             let total = 0;
             
-            inputs.forEach(input => {
-                const value = parseInt(input.value) || 0;
-                total += value;
+            inputs.forEach((scoreInput, index) => {
+                const criteriaIndex = parseInt(scoreInput.dataset.criteriaIndex, 10);
+                const safeIndex = Number.isNaN(criteriaIndex) ? index : criteriaIndex;
+                const maxScore = getCriteriaMaxScore(safeIndex);
+                scoreInput.max = maxScore;
+                const safeValue = clampScore(scoreInput.value, maxScore);
+                if ((parseInt(scoreInput.value, 10) || 0) !== safeValue) {
+                    scoreInput.value = safeValue;
+                }
+                total += safeValue;
             });
             
             // Toplam input alanını güncelle
             const totalInput = row.querySelector('.total-input');
             if (totalInput) {
-                totalInput.value = total;
+                const totalMax = getTotalMaxScore();
+                totalInput.max = totalMax;
+                totalInput.value = Math.min(total, totalMax);
             }
         }
         
@@ -1637,12 +1769,15 @@
             const row = totalInput.closest('tr');
             const scoreInputs = row.querySelectorAll('.score');
             const total = parseInt(totalInput.value) || 0;
+            const totalMax = getTotalMaxScore();
             
             // Toplam puanın 5'in katı olmasını sağla
             const adjustedTotal = Math.round(total / 5) * 5;
-            totalInput.value = adjustedTotal;
+            const boundedTotal = Math.max(0, Math.min(adjustedTotal, totalMax));
+            totalInput.max = totalMax;
+            totalInput.value = boundedTotal;
             
-            if (adjustedTotal === 0) {
+            if (boundedTotal === 0) {
                 // Tüm puanları sıfırla
                 scoreInputs.forEach(input => {
                     input.value = 0;
@@ -1652,28 +1787,35 @@
             
             // Puanları rastgele dağıt
             const remainingPoints = Array(scoreInputs.length).fill(0);
-            let pointsToDistribute = adjustedTotal;
+            const maxScores = Array.from(scoreInputs).map((scoreInput, index) => {
+                const criteriaIndex = parseInt(scoreInput.dataset.criteriaIndex, 10);
+                const safeIndex = Number.isNaN(criteriaIndex) ? index : criteriaIndex;
+                return getCriteriaMaxScore(safeIndex);
+            });
+            let pointsToDistribute = boundedTotal;
             
             while (pointsToDistribute > 0) {
-                // 5 puan ekle
-                const randomIndex = Math.floor(Math.random() * scoreInputs.length);
-                // Eğer bu kriter zaten 10 puan almışsa, başka birine ver
-                if (remainingPoints[randomIndex] < 10) {
-                    const pointsToAdd = Math.min(5, 10 - remainingPoints[randomIndex]);
-                    remainingPoints[randomIndex] += pointsToAdd;
-                    pointsToDistribute -= pointsToAdd;
-                }
-                
-                // Eğer tüm kriterler 10 puana ulaştıysa çık
-                if (remainingPoints.every(p => p >= 10)) {
+                const availableIndices = remainingPoints
+                    .map((points, index) => (points < maxScores[index] ? index : -1))
+                    .filter(index => index !== -1);
+                if (!availableIndices.length) {
                     break;
                 }
+                
+                const randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+                const maxAddable = maxScores[randomIndex] - remainingPoints[randomIndex];
+                const pointsToAdd = Math.min(5, maxAddable, pointsToDistribute);
+                remainingPoints[randomIndex] += pointsToAdd;
+                pointsToDistribute -= pointsToAdd;
             }
             
             // Puanları input alanlarına yaz
             remainingPoints.forEach((points, index) => {
+                scoreInputs[index].max = maxScores[index];
                 scoreInputs[index].value = points;
             });
+            
+            updateTotal(scoreInputs[0]);
         }
         
         // Toplam alanları arasında ok tuşlarıyla gezinme
@@ -1734,8 +1876,7 @@
             
             let scoreInputs = '';
             for (let i = 0; i < criteria.length; i++) {
-                const criteriaNum = i + 1;
-                scoreInputs += `<td><input type="number" min="0" max="10" value="0" class="score" onchange="updateTotal(this)" title="${criteriaNum}. ${criteria[i]} puanı" aria-label="${criteriaNum}. ${criteria[i]}"></td>`;
+                scoreInputs += getScoreInputHtml(i, criteria[i], 0);
             }
             
             newRow.innerHTML = `
@@ -1743,7 +1884,7 @@
                 <td>${studentName}</td>
                 ${scoreInputs}
                 <td class="total">
-                    <input type="number" min="0" max="100" step="5" value="0" class="total-input" title="Toplam puan" aria-label="Toplam puan" onchange="distributeTotal(this)" onfocus="this.select()" onkeydown="handleTotalNavigation(event, this)">
+                    <input type="number" min="0" max="${getTotalMaxScore()}" step="5" value="0" class="total-input" title="Toplam puan" aria-label="Toplam puan" onchange="distributeTotal(this)" onfocus="this.select()" onkeydown="handleTotalNavigation(event, this)">
                 </td>
                 <td>
                     <button class="btn-edit" title="Düzenle"><i class="bi bi-pencil-fill"></i></button>
@@ -2047,9 +2188,8 @@
                 
                 let scoreInputs = '';
                 for (let i = 0; i < criteria.length; i++) {
-                    const criteriaNum = i + 1;
                     const score = student.scores && student.scores[i] !== undefined ? student.scores[i] : 0;
-                    scoreInputs += `<td><input type="number" min="0" max="10" value="${score}" class="score" onchange="updateTotal(this)" title="${criteriaNum}. ${criteria[i]} puanı" aria-label="${criteriaNum}. ${criteria[i]}"></td>`;
+                    scoreInputs += getScoreInputHtml(i, criteria[i], score);
                 }
                 
                 newRow.innerHTML = `
@@ -2057,7 +2197,7 @@
                     <td>${student.studentName}</td>
                     ${scoreInputs}
                     <td class="total">
-                        <input type="number" min="0" max="100" step="5" value="${student.totalScore || 0}" class="total-input" title="Toplam puan" aria-label="Toplam puan" onchange="distributeTotal(this)" onfocus="this.select()" onkeydown="handleTotalNavigation(event, this)">
+                        <input type="number" min="0" max="${getTotalMaxScore()}" step="5" value="${student.totalScore || 0}" class="total-input" title="Toplam puan" aria-label="Toplam puan" onchange="distributeTotal(this)" onfocus="this.select()" onkeydown="handleTotalNavigation(event, this)">
                     </td>
                     <td>
                         <button class="btn-edit" title="Düzenle"><i class="bi bi-pencil-fill"></i></button>
@@ -2094,6 +2234,39 @@
                 switchClass(className);
             }
         });
+
+        function getPrintFitScaleForA4Portrait() {
+            const studentRows = document.querySelectorAll('#student-list tr');
+            if (!studentRows.length) {
+                return 1;
+            }
+
+            const a4PortraitHeightPx = (297 / 25.4) * 96;
+            const pageMarginPx = (0.5 / 2.54) * 96;
+            const footerReservePx = 24;
+            const availableHeight = a4PortraitHeightPx - (pageMarginPx * 2) - footerReservePx;
+
+            // Print CSS'teki boyutlara göre yaklaşık yükseklik hesabı.
+            const titleBlockHeight = 58;
+            const tableHeaderHeight = 42;
+            const rowHeight = 22;
+            const estimatedContentHeight = titleBlockHeight + tableHeaderHeight + (studentRows.length * rowHeight);
+
+            // Genişlik print CSS ile zaten yüzde bazlı ayarlandığı için yalnızca dikey sığdırma uygulanır.
+            const fitScale = availableHeight / estimatedContentHeight;
+            return Math.max(0.82, Math.min(1, fitScale));
+        }
+
+        function applyPrintFitScale(scale) {
+            const safeScale = Math.max(0.82, Math.min(1, scale || 1));
+            document.documentElement.style.setProperty('--print-scale', safeScale.toFixed(4));
+            document.body.classList.add('print-fit-active');
+        }
+
+        function clearPrintFitConfig() {
+            document.body.classList.remove('print-fit-active');
+            document.documentElement.style.removeProperty('--print-scale');
+        }
         
         // Yazdırma işlemi
         document.getElementById('print-btn').addEventListener('click', function() {
@@ -2145,13 +2318,25 @@
                 </div>
             `;
             tableContainer.appendChild(footer);
+
+            const printScale = getPrintFitScaleForA4Portrait();
+            applyPrintFitScale(printScale);
+            console.log('Yazdırma ölçeği (A4 dikey):', printScale);
+
+            const cleanupAfterPrint = () => {
+                if (footer.isConnected) {
+                    footer.remove();
+                }
+                clearPrintFitConfig();
+            };
+            window.addEventListener('afterprint', cleanupAfterPrint, { once: true });
             
             // Yazdır
             window.print();
             
             // Çıktı sonrası temizlik
             setTimeout(() => {
-                footer.remove();
+                cleanupAfterPrint();
             }, 1000);
         });
         
@@ -2192,6 +2377,7 @@
             editStudentNoInput.value = studentNo;
             editStudentNameInput.value = studentName;
             editStudentTotalInput.value = totalScore;
+            editStudentTotalInput.max = getTotalMaxScore();
             
             // Önceki olay dinleyicileri temizle
             const saveBtn = document.getElementById('save-edited-student');
@@ -2309,6 +2495,8 @@
                         <label for="criteria-${index}" class="form-label">${index + 1}. Kriter</label>
                         <div class="input-group">
                             <input type="text" class="form-control" id="criteria-${index}" value="${criterion}" placeholder="Değerlendirme kriterini yazın (ör: Proje Teslimi)">
+                            <span class="input-group-text">Maks.</span>
+                            <input type="number" min="0" class="form-control criteria-max-input" id="criteria-max-${index}" value="${getCriteriaMaxScore(index)}" placeholder="Maks. puan" title="Maksimum puan">
                             <button class="btn btn-outline-danger remove-criteria" type="button" data-index="${index}" title="Kriteri kaldır">
                                 <i class="bi bi-trash"></i>
                             </button>
@@ -2337,6 +2525,8 @@
                     <label for="criteria-${newIndex}" class="form-label">${newIndex + 1}. Kriter</label>
                     <div class="input-group">
                         <input type="text" class="form-control" id="criteria-${newIndex}" value="Yeni Kriter" placeholder="Yeni değerlendirme kriterini belirtin">
+                        <span class="input-group-text">Maks.</span>
+                        <input type="number" min="0" class="form-control criteria-max-input" id="criteria-max-${newIndex}" value="10" placeholder="Maks. puan" title="Maksimum puan">
                         <button class="btn btn-outline-danger remove-criteria" type="button" data-index="${newIndex}" title="Kriteri kaldır">
                             <i class="bi bi-trash"></i>
                         </button>
@@ -2360,8 +2550,15 @@
         document.getElementById('save-criteria').addEventListener('click', function() {
             // Yeni kriterleri al
             const newCriteria = [];
-            document.querySelectorAll('#criteria-list .input-group input').forEach(input => {
-                newCriteria.push(input.value.trim() || 'Kriter');
+            const newMaxScores = [];
+            document.querySelectorAll('#criteria-list .input-group').forEach(group => {
+                const nameInput = group.querySelector('input[type="text"]');
+                const maxInput = group.querySelector('.criteria-max-input');
+                if (!nameInput || !maxInput) {
+                    return;
+                }
+                newCriteria.push(nameInput.value.trim() || 'Kriter');
+                newMaxScores.push(sanitizeMaxScore(maxInput.value));
             });
             
             if (newCriteria.length === 0) {
@@ -2371,6 +2568,7 @@
             
             // Tablo başlıklarını güncelle
             criteria = newCriteria;
+            criteriaMaxScores = newMaxScores;
             updateTableHeaders();
             
             // Modalı kapat
@@ -2394,8 +2592,8 @@
             // Kriter başlıklarını ekle
             criteria.forEach((criterion, index) => {
                 const th = document.createElement('th');
-                th.className = 'align-middle';
-                th.innerHTML = `${index + 1}. ${criterion.replace(/\s+/g, '<br>')}`;
+                th.className = 'align-middle criteria-header-cell';
+                th.innerHTML = getCriteriaHeaderHtml(index, criterion);
                 headerRow.appendChild(th);
             });
             
@@ -2408,6 +2606,7 @@
             const secondRow = document.querySelector('thead tr:nth-child(2)');
             const puanlarCell = secondRow.querySelector('th');
             puanlarCell.setAttribute('colspan', criteria.length);
+            puanlarCell.textContent = 'Puanlar (Kriter Bazlı Maksimum)';
             
             // Tüm öğrencilerin input sayısını güncelle
             const studentRows = document.querySelectorAll('#student-list tr');
@@ -2424,16 +2623,13 @@
                 
                 // Her kriter için yeni input hücresi ekle
                 criteria.forEach((criterion, index) => {
-                    const td = document.createElement('td');
-                    const criteriaNum = index + 1;
-                    td.innerHTML = `<input type="number" min="0" max="10" value="0" class="score" onchange="updateTotal(this)" title="${criteriaNum}. ${criterion} puanı" aria-label="${criteriaNum}. ${criterion}">`;
-                    row.appendChild(td);
+                    row.insertAdjacentHTML('beforeend', getScoreInputHtml(index, criterion, 0));
                 });
                 
                 // Son iki hücreyi ekle
                 const totalCell = document.createElement('td');
                 totalCell.className = 'total';
-                totalCell.innerHTML = `<input type="number" min="0" max="100" step="5" value="0" class="total-input" title="Toplam puan" aria-label="Toplam puan" onchange="distributeTotal(this)" onfocus="this.select()" onkeydown="handleTotalNavigation(event, this)">`;
+                totalCell.innerHTML = `<input type="number" min="0" max="${getTotalMaxScore()}" step="5" value="0" class="total-input" title="Toplam puan" aria-label="Toplam puan" onchange="distributeTotal(this)" onfocus="this.select()" onkeydown="handleTotalNavigation(event, this)">`;
                 row.appendChild(totalCell);
                 
                 // İşlem hücresi
@@ -2476,6 +2672,24 @@
         // Uygulamayı başlat
         document.addEventListener('DOMContentLoaded', function() {
             // Varsayılan sınıfı aktif etme işlemi kaldırıldı
+            document.querySelectorAll('#student-list tr').forEach(row => {
+                row.querySelectorAll('.score').forEach((input, index) => {
+                    input.dataset.criteriaIndex = index;
+                    input.max = getCriteriaMaxScore(index);
+                    input.value = clampScore(input.value, getCriteriaMaxScore(index));
+                });
+
+                const totalInput = row.querySelector('.total-input');
+                if (totalInput) {
+                    totalInput.max = getTotalMaxScore();
+                }
+
+                const scoreInput = row.querySelector('.score');
+                if (scoreInput) {
+                    updateTotal(scoreInput);
+                }
+            });
+
             // Mevcut öğrenci satırlarındaki düğmelere olay dinleyicileri ekle
             document.querySelectorAll('#student-list tr').forEach(row => {
                 // Silme düğmesine olay dinleyici ekle
@@ -2543,8 +2757,15 @@
                 newSaveCriteriaBtn.addEventListener('click', function() {
                     // Yeni kriterleri al
                     const newCriteria = [];
-                    document.querySelectorAll('#criteria-list .input-group input').forEach(input => {
-                        newCriteria.push(input.value.trim() || 'Kriter');
+                    const newMaxScores = [];
+                    document.querySelectorAll('#criteria-list .input-group').forEach(group => {
+                        const nameInput = group.querySelector('input[type="text"]');
+                        const maxInput = group.querySelector('.criteria-max-input');
+                        if (!nameInput || !maxInput) {
+                            return;
+                        }
+                        newCriteria.push(nameInput.value.trim() || 'Kriter');
+                        newMaxScores.push(sanitizeMaxScore(maxInput.value));
                     });
                     
                     if (newCriteria.length === 0) {
@@ -2556,6 +2777,7 @@
                     
                     // Tablo başlıklarını güncelle
                     criteria = newCriteria;
+                    criteriaMaxScores = newMaxScores;
                     updateTableHeaders();
                     
                     // Modalı kapat
@@ -2784,8 +3006,7 @@
                 
                 let scoreInputs = '';
                 for (let i = 0; i < criteria.length; i++) {
-                    const criteriaNum = i + 1;
-                    scoreInputs += `<td><input type="number" min="0" max="10" value="0" class="score" onchange="updateTotal(this)" title="${criteriaNum}. ${criteria[i]} puanı" aria-label="${criteriaNum}. ${criteria[i]}"></td>`;
+                    scoreInputs += getScoreInputHtml(i, criteria[i], 0);
                 }
                 
                 newRow.innerHTML = `
@@ -2793,7 +3014,7 @@
                     <td>${student.first_name} ${student.last_name}</td>
                     ${scoreInputs}
                     <td class="total">
-                        <input type="number" min="0" max="100" step="5" value="0" class="total-input" title="Toplam puan" aria-label="Toplam puan" onchange="distributeTotal(this)" onfocus="this.select()" onkeydown="handleTotalNavigation(event, this)">
+                        <input type="number" min="0" max="${getTotalMaxScore()}" step="5" value="0" class="total-input" title="Toplam puan" aria-label="Toplam puan" onchange="distributeTotal(this)" onfocus="this.select()" onkeydown="handleTotalNavigation(event, this)">
                     </td>
                     <td>
                         <button class="btn-edit" title="Düzenle"><i class="bi bi-pencil-fill"></i></button>
