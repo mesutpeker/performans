@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  .criteria-header-cell {
+    border: 1px solid black;
+    width: 60px;
+    height: 140px;
+    padding: 5px;
+    vertical-align: middle;
+  }
+  .criteria-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
+  .criteria-text {
+    display: inline-block;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    text-align: center;
+    white-space: normal;
+    line-height: 1.15;
+    flex: 1 1 auto;
+    margin: auto 0;
+    max-height: 100px; /* test */
+  }
+  .criteria-max-text {
+    margin-top: 5px;
+    font-size: 8pt;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+  <table>
+    <tr>
+      <th class=criteria-header-cell>
+        <span class=criteria-header>
+          <span class=criteria-text>Derse Hazırlıklı Gelme ve Katılma</span>
+          <span class=criteria-max-text>(10)</span>
+        </span>
+      </th>
+    </tr>
+  </table>
+</body>
+</html>

@@ -381,6 +381,11 @@
             font-size: 0.85rem;
         }
         
+        .table th .criteria-text {
+            word-wrap: break-word;
+            white-space: normal;
+        }
+        
         @media print {
             /* Temel sayfa ayarları */
             @page {
@@ -631,40 +636,43 @@
             }
 
             .table th .criteria-number {
-                display: block;
-                height: 12px;
-                line-height: 12px;
-                font-weight: 700;
-                margin-bottom: 1px;
+                display: none !important;
             }
 
             .table th .criteria-text {
-                display: block;
+                display: inline-block;
                 line-height: 1.15;
                 flex: 1 1 auto;
+                writing-mode: vertical-rl;
+                transform: rotate(180deg);
+                text-align: center;
+                white-space: normal;
+                margin: auto 0;
+                max-height: 100px;
             }
 
             .table th .criteria-max-text {
                 display: block;
-                margin-top: auto;
+                margin-top: 5px;
                 line-height: 1;
                 font-size: 8pt;
                 font-weight: 600;
             }
 
             .table th.criteria-header-cell {
-                vertical-align: top !important;
-                padding-top: 1px !important;
-                padding-bottom: 1px !important;
+                vertical-align: middle !important;
+                padding-top: 5px !important;
+                padding-bottom: 5px !important;
+                height: 140px !important;
             }
 
             .table th .criteria-header {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                justify-content: flex-start;
+                justify-content: center;
                 height: 100%;
-                min-height: 44px;
+                min-height: 130px;
             }
             
             /* İkinci satır başlık hücresi */
@@ -1297,6 +1305,14 @@
         .class-selection-row .btn-group {
             display: flex;
             gap: 5px;
+        @keyframes highlight-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.8); }
+            70% { box-shadow: 0 0 0 15px rgba(220, 53, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+        }
+        .highlight-pulse-effect {
+            animation: highlight-pulse 1.5s cubic-bezier(0.66, 0, 0, 1) forwards;
+            border-color: #dc3545 !important;
         }
     </style>
 </head>
@@ -1308,7 +1324,7 @@
         <div class="header-card">
             <h5 class="header-title editable-title-container">
                 <i class="bi bi-pencil-fill edit-icon"></i>
-                <span id="main-title" contenteditable="true" placeholder="Okul Adını Giriniz">KARAMAN MESLEKİ VE TEKNİK ANADOLU LİSESİ TÜRK DİLİ VE EDEBİYATI PERFORMANS DEĞERLENDİRME ÖLÇEĞİ</span>
+                <span id="main-title" contenteditable="true" placeholder="Okul Adını Giriniz">OKUL ADI GİRİNİZ</span>
                 <button class="btn btn-sm btn-outline-primary ms-2" id="update-title-btn" style="display: none;">Başlığı Güncelle</button>
             </h5>
         </div>
@@ -1371,6 +1387,7 @@
 
                 <div class="button-group mb-3">
                     <button id="add-student-btn" class="btn btn-purple">Öğrenci Ekle</button>
+                    <button id="e-okul-paste-btn" class="btn btn-teal">E-Okul'dan Kopyala</button>
                     <button id="print-btn" class="btn btn-success">Yazdır</button>
                     <button id="clear-table-btn" class="btn btn-warning">Tabloyu Temizle</button>
                     <button id="edit-criteria-btn" class="btn btn-info">Kriterleri Düzenle</button>
@@ -1380,7 +1397,7 @@
                 <div class="table-container">
                     <div class="print-container">
                         <div class="text-center p-3 fw-bold text-uppercase" id="print-main-title">
-                            KARAMAN MESLEKİ VE TEKNİK ANADOLU LİSESİ TÜRK DİLİ VE EDEBİYATI PERFORMANS DEĞERLENDİRME ÖLÇEĞİ
+                            OKUL ADI GİRİNİZ
                         </div>
                         <div class="text-center mt-1" id="print-evaluation-title">Ders İçi Performans Değerlendirme - 9/E</div>
                         <div class="text-center pb-2" id="print-performance-title">Performans Değerlendirme Kriterleri</div>
@@ -1391,16 +1408,16 @@
                                     <tr>
                                         <th rowspan="2" class="align-middle">Öğrenci<br>No</th>
                                         <th rowspan="2" class="align-middle">Öğrenci Adı Soyadı</th>
-                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">1.</span><span class="criteria-text">Derse<br>Hazırlıklı<br>Gelme</span><span class="criteria-max-text">(10)</span></span></th>
-                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">2.</span><span class="criteria-text">Derse<br>Katılım</span><span class="criteria-max-text">(10)</span></span></th>
-                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">3.</span><span class="criteria-text">Ödevleri<br>Zamanında<br>Yapma</span><span class="criteria-max-text">(10)</span></span></th>
-                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">4.</span><span class="criteria-text">Ders<br>Araç-<br>Gereçleri</span><span class="criteria-max-text">(10)</span></span></th>
-                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">5.</span><span class="criteria-text">Not<br>Tutma</span><span class="criteria-max-text">(10)</span></span></th>
-                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">6.</span><span class="criteria-text">Etkili<br>Dinleme</span><span class="criteria-max-text">(10)</span></span></th>
-                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">7.</span><span class="criteria-text">Soru<br>Cevaplama</span><span class="criteria-max-text">(10)</span></span></th>
-                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">8.</span><span class="criteria-text">Soru<br>Sorma</span><span class="criteria-max-text">(10)</span></span></th>
-                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">9.</span><span class="criteria-text">Konuya<br>Hakimiyet</span><span class="criteria-max-text">(10)</span></span></th>
-                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">10.</span><span class="criteria-text">Etkinliklerin<br>Farkında<br>Olma</span><span class="criteria-max-text">(10)</span></span></th>
+                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">1.</span><span class="criteria-text">Derse Hazırlıklı Gelme</span><span class="criteria-max-text">(10)</span></span></th>
+                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">2.</span><span class="criteria-text">Derse Katılım</span><span class="criteria-max-text">(10)</span></span></th>
+                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">3.</span><span class="criteria-text">Ödevleri Zamanında Yapma</span><span class="criteria-max-text">(10)</span></span></th>
+                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">4.</span><span class="criteria-text">Ders Araç-Gereçleri</span><span class="criteria-max-text">(10)</span></span></th>
+                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">5.</span><span class="criteria-text">Not Tutma</span><span class="criteria-max-text">(10)</span></span></th>
+                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">6.</span><span class="criteria-text">Etkili Dinleme</span><span class="criteria-max-text">(10)</span></span></th>
+                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">7.</span><span class="criteria-text">Soru Cevaplama</span><span class="criteria-max-text">(10)</span></span></th>
+                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">8.</span><span class="criteria-text">Soru Sorma</span><span class="criteria-max-text">(10)</span></span></th>
+                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">9.</span><span class="criteria-text">Konuya Hakimiyet</span><span class="criteria-max-text">(10)</span></span></th>
+                                        <th class="align-middle criteria-header-cell"><span class="criteria-header"><span class="criteria-number">10.</span><span class="criteria-text">Etkinliklerin Farkında Olma</span><span class="criteria-max-text">(10)</span></span></th>
                                         <th rowspan="2" class="align-middle">Toplam</th>
                                         <th rowspan="2" class="align-middle">İşlem</th>
                                     </tr>
@@ -1481,6 +1498,35 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
                     <button type="button" class="btn btn-primary" id="save-student-btn">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- E-Okul'dan Kopyala Modalı -->
+    <div class="modal fade" id="eOkulPasteModal" tabindex="-1" aria-labelledby="eOkulPasteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eOkulPasteModalLabel">E-Okul'dan Kopyala</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info" style="background-color: #e8f4fd; border-color: #b8e0fd;">
+                        <h6 class="mb-2" style="font-size: 0.95rem; color: #0a58ca;">E-Okul'dan Kopyalama Adımları:</h6>
+                        <ol style="font-size: 0.85rem; padding-left: 1.5rem; margin-bottom: 0;">
+                            <li>E-Okul üzerinde ilgili not ekranını açın.</li>
+                            <li>Tüm öğrencileri seçerek kopyalayın (Ctrl+C / Cmd+C).</li>
+                            <li>Aşağıdaki alana yapıştırın (Ctrl+V / Cmd+V).</li>
+                        </ol>
+                    </div>
+                    <div class="mb-3">
+                        <textarea class="form-control" id="eOkulPastedData" rows="10" placeholder="Kopyaladığınız veriyi buraya yapıştırın..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-primary" id="process-e-okul-paste-btn">Ekle</button>
                 </div>
             </div>
         </div>
@@ -1659,7 +1705,7 @@
         
         // Başlık verileri
         let titleData = {
-            mainTitle: "KARAMAN MESLEKİ VE TEKNİK ANADOLU LİSESİ TÜRK DİLİ VE EDEBİYATI PERFORMANS DEĞERLENDİRME ÖLÇEĞİ",
+            mainTitle: "OKUL ADI GİRİNİZ",
             performanceTitle: "Performans Değerlendirme Kriterleri",
             evaluationTitle: "Ders İçi Performans Değerlendirme"
         };
@@ -1734,7 +1780,7 @@
 
         function getCriteriaHeaderHtml(index, criterion) {
             const maxScore = getCriteriaMaxScore(index);
-            return `<span class="criteria-header"><span class="criteria-number">${index + 1}.</span><span class="criteria-text">${criterion.replace(/\s+/g, '<br>')}</span><span class="criteria-max-text">(${maxScore})</span></span>`;
+            return `<span class="criteria-header"><span class="criteria-number">${index + 1}.</span><span class="criteria-text">${criterion}</span><span class="criteria-max-text">(${maxScore})</span></span>`;
         }
         
         // Toplam puan hesaplama
@@ -2667,6 +2713,118 @@
             // PDF modali aç
             const pdfModal = new bootstrap.Modal(document.getElementById('pdfModal'));
             pdfModal.show();
+        });
+
+        // E-Okul'dan Kopyala Butonu
+        document.getElementById('e-okul-paste-btn').addEventListener('click', function() {
+            const classKeys = Object.keys(classData);
+            
+            // Eğer aktif sınıf yoksa ama veri yapısında sadece 1 sınıf varsa, otomatik seç
+            if (!activeClass && classKeys.length === 1) {
+                switchClass(classKeys[0]);
+            }
+
+            if (!activeClass) {
+                if (classKeys.length > 0) {
+                    alert('Lütfen e-okul verilerini eklemek istediğiniz sınıfı seçin!');
+                    
+                    // Sınıf seçimi için görsel uyarı
+                    document.querySelectorAll('.class-tag').forEach(tag => {
+                        tag.classList.add('highlight-pulse-effect');
+                        setTimeout(() => tag.classList.remove('highlight-pulse-effect'), 1500);
+                    });
+                    const classSelect = document.getElementById('class-select');
+                    if (classSelect) {
+                        classSelect.classList.add('highlight-pulse-effect');
+                        setTimeout(() => classSelect.classList.remove('highlight-pulse-effect'), 1500);
+                    }
+                } else {
+                    alert('Lütfen önce bir sınıf oluşturun!');
+                }
+                return;
+            }
+
+            document.getElementById('eOkulPastedData').value = '';
+            const eOkulModal = new bootstrap.Modal(document.getElementById('eOkulPasteModal'));
+            eOkulModal.show();
+        });
+
+        // E-Okul'dan Kopyalanan Veriyi İşleme
+        document.getElementById('process-e-okul-paste-btn').addEventListener('click', function() {
+            const text = document.getElementById('eOkulPastedData').value;
+            if (!text.trim()) {
+                alert('Lütfen kopyaladığınız veriyi alana yapıştırın.');
+                return;
+            }
+
+            const lines = text.split('\n');
+            const studentsToAdd = [];
+            
+            for (const line of lines) {
+                const match = line.match(/^(\d+)\s+([a-zA-ZÇĞİÖŞÜçğıöşü\s]+)$/);
+                if (match && match[2].trim().length > 0) {
+                    studentsToAdd.push({
+                        no: match[1],
+                        name: match[2].trim()
+                    });
+                }
+            }
+
+            if (studentsToAdd.length === 0) {
+                alert('Yapıştırdığınız metinden hiç öğrenci bulunamadı. Lütfen kopyaladığınız veriyi kontrol edin.');
+                return;
+            }
+
+            const studentList = document.getElementById('student-list');
+            
+            studentsToAdd.forEach(student => {
+                const newRow = document.createElement('tr');
+                
+                let scoreInputs = '';
+                for (let i = 0; i < criteria.length; i++) {
+                    scoreInputs += getScoreInputHtml(i, criteria[i], 0);
+                }
+                
+                newRow.innerHTML = `
+                    <td>${student.no}</td>
+                    <td>${student.name}</td>
+                    ${scoreInputs}
+                    <td class="total">
+                        <input type="number" min="0" max="${getTotalMaxScore()}" step="5" value="0" class="total-input" title="Toplam puan" aria-label="Toplam puan" onchange="distributeTotal(this)" onfocus="this.select()" onkeydown="handleTotalNavigation(event, this)">
+                    </td>
+                    <td>
+                        <button class="btn-edit" title="Düzenle"><i class="bi bi-pencil-fill"></i></button>
+                        <button class="btn-delete" title="Sil"><i class="bi bi-trash-fill"></i></button>
+                    </td>
+                `;
+                
+                studentList.appendChild(newRow);
+                
+                // Silme düğmesine olay dinleyici ekle
+                const deleteBtn = newRow.querySelector('.btn-delete');
+                deleteBtn.addEventListener('click', function() {
+                    if (confirm('Bu öğrenciyi silmek istediğinizden emin misiniz?')) {
+                        newRow.remove();
+                        saveCurrentClassData();
+                    }
+                });
+                
+                // Düzenleme düğmesine olay dinleyici ekle
+                const editBtn = newRow.querySelector('.btn-edit');
+                editBtn.addEventListener('click', function() {
+                    editStudent(newRow);
+                });
+            });
+
+            saveCurrentClassData();
+
+            // Modalı kapat
+            const eOkulModalInstance = bootstrap.Modal.getInstance(document.getElementById('eOkulPasteModal'));
+            if (eOkulModalInstance) {
+                eOkulModalInstance.hide();
+            }
+            
+            alert(`${studentsToAdd.length} öğrenci başarıyla eklendi.`);
         });
 
         // Uygulamayı başlat
