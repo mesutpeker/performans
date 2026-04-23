@@ -1399,7 +1399,7 @@
                         <div class="text-center p-3 fw-bold text-uppercase" id="print-main-title">
                             OKUL ADI GİRİNİZ
                         </div>
-                        <div class="text-center mt-1" id="print-evaluation-title">Ders İçi Performans Değerlendirme - 9/E</div>
+                        <div class="text-center mt-1" id="print-evaluation-title">Ders İçi Performans Değerlendirme</div>
                         <div class="text-center pb-2" id="print-performance-title">Performans Değerlendirme Kriterleri</div>
                     
                         <div class="table-responsive">
@@ -2325,16 +2325,19 @@
             if (evaluationTitleElem) {
                 let evaluationText = document.getElementById('evaluation-title').textContent;
                 // Sınıf bilgisini ekle
-                const currentClass = activeClass || "9/E";
+                const currentClass = activeClass || "";
                 
-                // Kontrol et - eğer uzun sınıf adı formatıysa kısalt
-                let formattedCurrentClass = currentClass;
-                const longFormatMatch = currentClass.match(/(\d+)[.\s]*Sınıf\s*\/?\s*([A-Z])\s*Şubesi/i);
-                if (longFormatMatch) {
-                    formattedCurrentClass = `${longFormatMatch[1]}/${longFormatMatch[2]}`;
+                if (currentClass) {
+                    // Kontrol et - eğer uzun sınıf adı formatıysa kısalt
+                    let formattedCurrentClass = currentClass;
+                    const longFormatMatch = currentClass.match(/(\d+)[.\s]*Sınıf\s*\/?\s*([A-Z])\s*Şubesi/i);
+                    if (longFormatMatch) {
+                        formattedCurrentClass = `${longFormatMatch[1]}/${longFormatMatch[2]}`;
+                    }
+                    evaluationTitleElem.textContent = evaluationText + " - " + formattedCurrentClass;
+                } else {
+                    evaluationTitleElem.textContent = evaluationText;
                 }
-                
-                evaluationTitleElem.textContent = evaluationText + " - " + formattedCurrentClass;
             }
             if (performanceTitleElem) performanceTitleElem.textContent = document.getElementById('performance-title').textContent;
             
