@@ -2341,7 +2341,8 @@
     </script>
     
     <!-- PDF işleme kodunu içe aktarma -->
-    <script src="pdf-processing.js"></script>
+    <script src="pdf-parser-core.js?v=class-headings-20260908"></script>
+    <script src="pdf-processing.js?v=class-headings-20260908"></script>
     
     <script>
         // Global değişkenler
@@ -2362,9 +2363,7 @@
         let criteriaMaxScores = Array(criteria.length).fill(10);
         
         // Sınıf verileri için hafıza yapısı
-        let classData = {
-            // Varsayılan sınıf kaldırıldı
-        };
+        let classData = Object.create(null);
         
         // Aktif sınıf
         let activeClass = "";
@@ -3749,12 +3748,12 @@
                 const classTag = document.createElement('div');
                 classTag.className = 'class-tag';
                 classTag.innerHTML = `
-                    ${className}
                     <div class="tag-actions">
                         <button title="Düzenle"><i class="bi bi-pencil-square"></i></button>
                         <button title="Sil"><i class="bi bi-x"></i></button>
                     </div>
                 `;
+                classTag.prepend(document.createTextNode(`\n                    ${className}\n                    `));
                 classTagsContainer.appendChild(classTag);
                 
                 // Sınıf seçim listesine ekle

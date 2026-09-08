@@ -1,234 +1,50 @@
 // PDF'den sınıf ve öğrenci bilgilerini çıkarma
 async function extractClassInfo(pdf) {
-    const classes = {};
-    const numPages = pdf.numPages;
-    
-    try {
-        for (let pageNum = 1; pageNum <= numPages; pageNum++) {
-            debugLog(`Sayfa ${pageNum}/${numPages} işleniyor...`);
-            const page = await pdf.getPage(pageNum);
-            const textContent = await page.getTextContent();
-            debugLog(`Sayfa ${pageNum} - metin öğe sayısı: ${textContent.items.length}`);
-            
-            // 1. Tüm metin içeriğini birleştirme
-            let fullText = '';
-            let prevItem = null;
-            let lineTexts = [];
-            let currentLine = [];
-            
-            // İlk adımda satırları oluştur
-            for (const item of textContent.items) {
-                if (prevItem && Math.abs(prevItem.transform[5] - item.transform[5]) < 2) {
-                    // Aynı satırda, önceki öğeye ekle
-                    currentLine.push(item);
-                } else {
-                    // Yeni satır başlat
-                    if (currentLine.length > 0) {
-                        lineTexts.push(currentLine);
-                    }
-                    currentLine = [item];
-                }
-                prevItem = item;
-            }
-            
-            // Son satırı ekle
-            if (currentLine.length > 0) {
-                lineTexts.push(currentLine);
-            }
-            
-            // Her satırı işle ve metne dönüştür
-            let lines = [];
-            for (const line of lineTexts) {
-                // Satırdaki öğeleri x pozisyonuna göre sırala
-                line.sort((a, b) => a.transform[4] - b.transform[4]);
-                
-                let lineText = '';
-                let prevLineItem = null;
-                
-                for (const item of line) {
-                    if (prevLineItem) {
-                        // Öğeler arasındaki mesafeyi kontrol et
-                        const gap = item.transform[4] - (prevLineItem.transform[4] + prevLineItem.width);
-                        
-                        // Yakın karakterleri birleştir (küçük aralıkları yok say)
-                        if (gap < 2) {
-                            lineText += item.str;
-                        } else if (gap < 20) {
-                            // Normal kelime aralığı
-                            lineText += ' ' + item.str;
-                        } else {
-                            // Büyük boşluk, muhtemelen sütun aralığı
-                            lineText += '\t' + item.str;
-                        }
-                    } else {
-                        lineText += item.str;
-                    }
-                    prevLineItem = item;
-                }
-                
-                lines.push(lineText);
-                fullText += lineText + '\n';
-            }
-            
-            // Geliştirme modunda metin içeriğini gösterme
-            if (debugMode) {
-                debugLog(`Sayfa ${pageNum} metin içeriği (ilk 500 karakter):`, fullText.substring(0, 500) + '...');
-            }
-            
-            // 2. Sınıf adını bulma
-            const classNamePattern = /(\d+\.\s*Sınıf\s*\/\s*[A-Z]\s*Şubesi.*?)(?:\n|$)/i;
-            const classMatch = fullText.match(classNamePattern);
-            let currentClass = null;
-            
-            if (classMatch) {
-                currentClass = classMatch[1].trim();
-                debugLog(`Sınıf bulundu: ${currentClass}`);
-                classes[currentClass] = [];
-            } else {
-                debugLog(`Sayfa ${pageNum}'de sınıf bilgisi bulunamadı`);
-            }
-            
-            // 3. Öğrenci bilgilerini bulma ve sınıflandırma
-            // Öğrenci bilgilerini hem tam metin hem de satır bazında ara
-            if (currentClass) {
-                // A) Satır bazlı arama (öncelikli)
-                let studentsFound = false;
-                
-                for (const line of lines) {
-                    // Tab karakterleri ile ayrılmış alanları içeren satırlar muhtemelen öğrenci satırlarıdır
-                    if (line.includes('\t')) {
-                        const columns = line.split('\t').map(col => col.trim());
-                        
-                        // En az 3 sütun var mı kontrol et (numara, isim, soyisim için)
-                        if (columns.length >= 3) {
-                            // İlk sütun numara mı kontrol et
-                            const numberMatch = columns[0].match(/^\s*(\d+)\s*$/);
-                            if (numberMatch) {
-                                const studentNo = numberMatch[1];
-                                
-                                // Cinsiyet bilgisini bul (genellikle ayrı bir sütunda)
-                                let genderIndex = -1;
-                                for (let i = 1; i < columns.length; i++) {
-                                    if (/^(Erkek|Kız|erkek|kız)$/i.test(columns[i])) {
-                                        genderIndex = i;
-                                        break;
-                                    }
-                                }
-                                
-                                if (genderIndex > 0) {
-                                    // Ad ve soyad için uygun indeksleri belirle
-                                    let firstName = columns[1].replace(/\s+/g, ' ').trim();
-                                    let lastName = columns[genderIndex + 1] ? columns[genderIndex + 1].replace(/\s+/g, ' ').trim() : '';
-                                    
-                                    // Soyadı yoksa, ad ve soyadı aynı sütunda olabilir
-                                    if (!lastName && firstName.includes(' ')) {
-                                        const nameParts = firstName.split(' ');
-                                        lastName = nameParts.pop();
-                                        firstName = nameParts.join(' ');
-                                    }
-                                    
-                                    if (firstName && lastName) {
-                                        // Harfleri düzeltme
-                                        firstName = mergeLetters(firstName);
-                                        lastName = mergeLetters(lastName);
-                                        
-                                        classes[currentClass].push({
-                                            student_no: studentNo,
-                                            first_name: firstName, 
-                                            last_name: lastName
-                                        });
-                                        
-                                        studentsFound = true;
-                                        
-                                        if (debugMode && classes[currentClass].length <= 3) {
-                                            debugLog(`Öğrenci bulundu (satır): ${studentNo} ${firstName} ${lastName}`);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                
-                // Eğer satır bazlı arama öğrenci bulamadıysa, regex ile dene
-                if (!studentsFound) {
-                    debugLog(`Satır bazlı arama öğrenci bulamadı, regex ile deneniyor...`);
-                    
-                    // B) Regex ile arama (yedek yöntem)
-                    const studentPattern = /\b(\d+)\s+([A-ZĞÜŞİÖÇÂÎÛa-zğüşıöçâîû\s]+?)\s+(Erkek|Kız|erkek|kız)\s+([A-ZĞÜŞİÖÇÂÎÛa-zğüşıöçâîû\s]+?)\s*(?:\n|$)/g;
-                    
-                    let match;
-                    while ((match = studentPattern.exec(fullText)) !== null) {
-                        let firstName = match[2].trim().replace(/\s+/g, ' ');
-                        let lastName = match[4].trim().replace(/\s+/g, ' ');
-                        
-                        // Harfleri düzeltme
-                        firstName = mergeLetters(firstName);
-                        lastName = mergeLetters(lastName);
-                        
-                        classes[currentClass].push({
-                            student_no: match[1].trim(),
-                            first_name: firstName,
-                            last_name: lastName
-                        });
-                        
-                        if (debugMode && classes[currentClass].length <= 3) {
-                            debugLog(`Öğrenci bulundu (regex): ${match[1].trim()} ${firstName} ${lastName}`);
-                        }
-                    }
-                }
-                
-                // C) Son çare olarak, daha esnek bir desen dene
-                if (classes[currentClass].length === 0) {
-                    debugLog(`Standart desenlerle öğrenci bulunamadı, daha esnek desen deneniyor...`);
-                    
-                    for (const line of lines) {
-                        // Başında sayı olan her satırı kontrol et
-                        const loosePattern = /^\s*(\d+)\s+(.*)/;
-                        const match = line.match(loosePattern);
-                        
-                        if (match) {
-                            const studentNo = match[1].trim();
-                            const restOfLine = match[2].trim();
-                            
-                            // Satırın geri kalanını boşluklara göre parçala
-                            const parts = restOfLine.split(/\s+/);
-                            
-                            if (parts.length >= 2) {
-                                // Son kelime soyad olarak kabul et
-                                const lastName = parts.pop();
-                                // Geri kalan kısım ad olarak kabul et
-                                const firstName = parts.join(' ');
-                                
-                                if (firstName && lastName) {
-                                    // Harfleri düzeltme
-                                    let correctedFirstName = mergeLetters(firstName);
-                                    let correctedLastName = mergeLetters(lastName);
-                                    
-                                    classes[currentClass].push({
-                                        student_no: studentNo,
-                                        first_name: correctedFirstName,
-                                        last_name: correctedLastName
-                                    });
-                                    
-                                    if (debugMode && classes[currentClass].length <= 3) {
-                                        debugLog(`Öğrenci bulundu (esnek desen): ${studentNo} ${correctedFirstName} ${correctedLastName}`);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                
-                debugLog(`${currentClass} sınıfında ${classes[currentClass].length} öğrenci bulundu`);
-            }
+    const classes = Object.create(null);
+    let currentClass = null;
+    let previousRowNumber = null;
+
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum += 1) {
+        debugLog(`Sayfa ${pageNum}/${pdf.numPages} işleniyor...`);
+        const page = await pdf.getPage(pageNum);
+        const textContent = await page.getTextContent();
+
+        // Okunamayan bir sayfanın ardından öğrencileri önceki sınıfa bağlama.
+        if (textContent.items.length === 0) {
+            currentClass = null;
+            previousRowNumber = null;
+            continue;
         }
-        
-        return classes;
-    } catch (err) {
-        debugLog(`PDF işleme hatası: ${err.message}`);
-        throw err;
+
+        const lines = PdfParserCore.buildPositionedLines(textContent.items);
+        // Başlık tanınmasa da okunabilir öğrenci satırlarını koru.
+        const pageResult = PdfParserCore.parsePageLines(lines);
+        const firstStudentIndex = lines.findIndex(line =>
+            PdfParserCore.normalizeSpace(line.text) === pageResult.students[0]?.source_text);
+        const headerLines = firstStudentIndex >= 0 ? lines.slice(0, firstStudentIndex) : lines;
+        const detectedClass = headerLines.map(line => PdfParserCore.extractClassName(line.text)).find(Boolean);
+        const hasReportTitle = headerLines.some(line => /(?:Sınıf|Şube)\s*Listesi/iu.test(line.text));
+        const firstRowNumber = Number(pageResult.students[0]?.source_text.match(/^(\d+)\s+\d+\s/u)?.[1]) || null;
+        const isContinuation = currentClass && !hasReportTitle && previousRowNumber !== null &&
+            firstRowNumber === previousRowNumber + 1;
+
+        if (detectedClass) {
+            currentClass = detectedClass;
+        } else if (!isContinuation) {
+            currentClass = `Başlığı okunamayan liste — Sayfa ${pageNum}`;
+        }
+
+        // Aynı sınıfın sonraki sayfası önceki öğrencileri silmez.
+        classes[currentClass] ||= [];
+        pageResult.students.forEach(student => classes[currentClass].push({ ...student, source_page: pageNum }));
+        previousRowNumber = Number(pageResult.students.at(-1)?.source_text.match(/^(\d+)\s+\d+\s/u)?.[1]) || null;
+        debugLog(`${currentClass}: ${classes[currentClass].length} öğrenci`);
     }
+
+    Object.keys(classes).forEach(className => {
+        classes[className] = PdfParserCore.deduplicateStudents(classes[className]).students;
+    });
+    return classes;
 }
 
 // Sınıfları ve öğrencileri görüntüleme
@@ -474,4 +290,4 @@ function copyRowInfo(e) {
         debugLog('Kopyalama hatası:', err);
         alert('Kopyalama işlemi başarısız oldu. Tarayıcı izinlerinizi kontrol edin.');
     });
-} 
+}
